@@ -220,3 +220,13 @@ func isNotFoundRetryableError(opType string) RetryErrorPredicateFunc {
 		return false, ""
 	}
 }
+
+// Retry if Dataflow Job operation returns a 400 with a specific message.
+func isDataflowNotReadyForCancelingError(err error) (bool, string) {
+	if gerr, ok := err.(*googleapi.Error); ok {
+		if gerr.Code == 400 && strings.Contains(strings.ToLower(gerr.Body), "not yet ready for canceling") {
+			return true, "Waiting for other concurrent Dataflow Job changes to finish"
+		}
+	}
+	return false, ""
+}

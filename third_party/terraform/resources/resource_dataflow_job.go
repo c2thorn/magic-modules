@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	dataflow "google.golang.org/api/dataflow/v1b3"
 	"google.golang.org/api/googleapi"
 )
@@ -265,37 +264,21 @@ func resourceDataflowJobDelete(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	// Retry updating the state while the job is not ready to be canceled/drained.
-	err = resource.Retry(time.Minute*time.Duration(15), func() *resource.RetryError {
-		// To terminate a dataflow job, we update the job with a requested
-		// terminal state.
-		job := &dataflow.Job{
-			RequestedState: requestedState,
+	job := &dataflow.Job{
+		RequestedState: requestedState,
+	}
+	err = retryTimeDuration(func() (updateErr error) {
+		_, updateErr = resourceDataflowJobUpdateJob(config, project, region, id, job)
+		if isDataflowJobTerminatedError(updateErr) {
+			// Job has already been terminated, skip.
+			return nil
 		}
-
-		_, updateErr := resourceDataflowJobUpdateJob(config, project, region, id, job)
-		if updateErr != nil {
-			gerr, isGoogleErr := updateErr.(*googleapi.Error)
-			if !isGoogleErr {
-				// If we have an error and it's not a google-specific error, we should go ahead and return.
-				return resource.NonRetryableError(updateErr)
-			}
-
-			if strings.Contains(gerr.Message, "not yet ready for canceling") {
-				// Retry cancelling job if it's not ready.
-				// Sleep to avoid hitting update quota with repeated attempts.
-				time.Sleep(5 * time.Second)
-				return resource.RetryableError(updateErr)
-			}
-
-			if strings.Contains(gerr.Message, "Job has terminated") {
-				// Job has already been terminated, skip.
-				return nil
-			}
+		if _, ok := updateErr.(*googleapi.Error); ok {
+			return nil
 		}
+		return updateErr
+	}, time.Minute*time.Duration(15), isDataflowNotReadyForCancelingError)
 
-		return nil
-	})
 	if err != nil {
 		return err
 	}
@@ -352,4 +335,11 @@ func resourceDataflowJobUpdateJob(config *Config, project string, region string,
 		return config.clientDataflow.Projects.Jobs.Update(project, id, job).Do()
 	}
 	return config.clientDataflow.Projects.Locations.Jobs.Update(project, region, id, job).Do()
+}
+
+func isDataflowJobTerminatedError(err error) bool {
+	if gerr, ok := err.(*googleapi.Error); ok {
+		return strings.Contains(strings.ToLower(gerr.Body), "job has terminated")
+	}
+	return false
 }
