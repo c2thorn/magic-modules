@@ -1,0 +1,453 @@
+<% autogen_exception -%>
+package google
+<% unless version == 'ga' -%>
+
+import (
+	"fmt"
+	"regexp"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	compute "google.golang.org/api/compute/v1"
+)
+
+func TestAccComputeInstanceFromMachineImage_basic(t *testing.T) {
+	t.Parallel()
+
+	var instance compute.Instance
+	instanceName := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	generatedInstanceName := fmt.Sprintf("terraform-test-generated-%s", randString(t, 10))
+	resourceName := "google_compute_instance_from_machine_image.foobar"
+
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProvidersOiCS,
+		CheckDestroy: testAccCheckComputeInstanceFromMachineImageDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeInstanceFromMachineImage_basic(instanceName, generatedInstanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(t, resourceName, &instance),
+
+					// Check that fields were set based on the template
+					resource.TestCheckResourceAttr(resourceName, "machine_type", "n1-standard-1"),
+					resource.TestCheckResourceAttr(resourceName, "attached_disk.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "scheduling.0.automatic_restart", "false"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstanceFromMachineImage_overrideBootDisk(t *testing.T) {
+	t.Parallel()
+
+	var instance compute.Instance
+	instanceName := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	generatedInstanceName := fmt.Sprintf("terraform-test-generated-%s", randString(t, 10))
+	imageDisk := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	overrideDisk := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	resourceName := "google_compute_instance_from_machine_image.foobar"
+
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProvidersOiCS,
+		CheckDestroy: testAccCheckComputeInstanceFromMachineImageDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeInstanceFromMachineImage_overrideBootDisk(imageDisk, overrideDisk, instanceName, generatedInstanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(t, resourceName, &instance),
+
+					// Check that fields were set based on the template
+					resource.TestCheckResourceAttr(resourceName, "boot_disk.#", "1"),
+					resource.TestMatchResourceAttr(resourceName, "boot_disk.0.source", regexp.MustCompile(overrideDisk)),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstanceFromMachineImage_overrideAttachedDisk(t *testing.T) {
+	t.Parallel()
+
+	var instance compute.Instance
+	instanceName := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	generatedInstanceName := fmt.Sprintf("terraform-test-generated-%s", randString(t, 10))
+	instanceDiskA := fmt.Sprintf("terraform-test-a-%s", randString(t, 10))
+	instanceDiskB := fmt.Sprintf("terraform-test-a-%s", randString(t, 10))
+	overrideDisk := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	resourceName := "google_compute_instance_from_machine_image.foobar"
+
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProvidersOiCS,
+		CheckDestroy: testAccCheckComputeInstanceFromMachineImageDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeInstanceFromMachineImage_overrideAttachedDisk(instanceDiskA, instanceDiskB, overrideDisk, instanceName, generatedInstanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(t, resourceName, &instance),
+
+					// Check that fields were set based on the template
+					resource.TestCheckResourceAttr(resourceName, "attached_disk.#", "1"),
+					resource.TestMatchResourceAttr(resourceName, "attached_disk.0.source", regexp.MustCompile(overrideDisk)),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstanceFromMachineImage_overrideScratchDisk(t *testing.T) {
+	t.Parallel()
+
+	var instance compute.Instance
+	instanceName := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	generatedInstanceName := fmt.Sprintf("terraform-test-generated-%s", randString(t, 10))
+	resourceName := "google_compute_instance_from_machine_image.foobar"
+
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProvidersOiCS,
+		CheckDestroy: testAccCheckComputeInstanceFromMachineImageDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeInstanceFromMachineImage_overrideScratchDisk(instanceName, generatedInstanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(t, resourceName, &instance),
+
+					// Check that fields were set based on the template
+					resource.TestCheckResourceAttr(resourceName, "scratch_disk.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "scratch_disk.0.interface", "NVME"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstanceFromMachineImage_overrideMetadataDotStartupScript(t *testing.T) {
+	t.Parallel()
+
+	var instance compute.Instance
+	instanceName := fmt.Sprintf("terraform-test-%s", randString(t, 10))
+	generatedInstanceName := fmt.Sprintf("terraform-test-generated-%s", randString(t, 10))
+	resourceName := "google_compute_instance_from_machine_image.foobar"
+
+	vcrTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProvidersOiCS,
+		CheckDestroy: testAccCheckComputeInstanceFromMachineImageDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccComputeInstanceFromMachineImage_overrideMetadataDotStartupScript(instanceName, generatedInstanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(t, resourceName, &instance),
+					resource.TestCheckResourceAttr(resourceName, "metadata.startup-script", ""),
+				),
+			},
+		},
+	})
+
+}
+
+func testAccCheckComputeInstanceFromMachineImageDestroyProducer(t *testing.T) func(s *terraform.State) error {
+	return func(s *terraform.State) error {
+		config := googleProviderConfig(t)
+
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != "google_compute_instance_from_machine_image" {
+				continue
+			}
+
+			_, err := config.clientCompute.Instances.Get(
+				config.Project, rs.Primary.Attributes["zone"], rs.Primary.ID).Do()
+			if err == nil {
+				return fmt.Errorf("Instance still exists")
+			}
+		}
+
+		return nil
+	}
+}
+
+func testAccComputeInstanceFromMachineImage_basic(instance, newInstance string) string {
+	return fmt.Sprintf(`
+resource "google_compute_instance" "vm" {
+  provider     = google-beta
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
+
+  name         = "%s"
+  machine_type = "n1-standard-1"
+
+  network_interface {
+    network = "default"
+  }
+
+  metadata = {
+    foo = "bar"
+  }
+
+  scheduling {
+    automatic_restart = true
+  }
+
+  can_ip_forward = true
+}
+
+resource "google_compute_machine_image" "foobar" {
+  provider        = google-beta
+  name            = "%s"
+  source_instance = google_compute_instance.vm.self_link
+}
+
+resource "google_compute_instance_from_machine_image" "foobar" {
+  provider = google-beta
+  name = "%s"
+  zone = "us-central1-a"
+
+  source_machine_image = google_compute_machine_image.foobar.self_link
+
+  // Overrides
+  can_ip_forward = false
+  labels = {
+    my_key = "my_value"
+  }
+  scheduling {
+    automatic_restart = false
+  }
+}
+`, instance, instance, newInstance)
+}
+
+func testAccComputeInstanceFromMachineImage_overrideBootDisk(imageDisk, overrideDisk, instanceName, generatedInstanceName string) string {
+	return fmt.Sprintf(`
+
+resource "google_compute_disk" "initial_disk" {
+  provider = google-beta
+  name  = "%s"
+  image = "debian-cloud/debian-9"
+  size  = 10
+  type  = "pd-ssd"
+  zone  = "us-central1-a"
+}
+
+resource "google_compute_disk" "override_disk" {
+  provider = google-beta
+  name  = "%s"
+  image = "debian-cloud/debian-10"
+  size  = 20
+  type  = "pd-ssd"
+  zone  = "us-central1-a"
+}
+
+resource "google_compute_instance" "vm" {
+  provider = google-beta
+  name         = "%s"
+  machine_type = "n1-standard-1"
+
+  network_interface {
+    network = "default"
+  }
+  
+  labels = {
+    test = "override-bootdisk"
+  }
+
+  boot_disk {
+    auto_delete = false
+    source = google_compute_disk.initial_disk.self_link
+  }
+}
+
+resource "google_compute_machine_image" "foobar" {
+  provider        = google-beta
+  name            = "%s"
+  source_instance = google_compute_instance.vm.self_link
+}
+
+resource "google_compute_instance_from_machine_image" "foobar" {
+  provider = google-beta
+  name = "%s"
+  zone = "us-central1-a"
+  source_machine_image = google_compute_machine_image.foobar.self_link
+
+  // Overrides
+  boot_disk {
+    source = google_compute_disk.override_disk.self_link
+  }
+}
+`, imageDisk, overrideDisk, instanceName, instanceName, generatedInstanceName)
+}
+
+func testAccComputeInstanceFromMachineImage_overrideAttachedDisk(instanceDiskA, instanceDiskB, overrideDisk, instanceName, generatedInstanceName string) string {
+	return fmt.Sprintf(`
+  resource "google_compute_disk" "disk_a" {
+    provider = google-beta
+    name  = "%s"
+    size  = 10
+    type  = "pd-ssd"
+    zone  = "us-central1-a"
+  }
+  
+  resource "google_compute_disk" "disk_b" {
+    provider = google-beta
+    name  = "%s"
+    size  = 20
+    type  = "pd-ssd"
+    zone  = "us-central1-a"
+  }
+
+  resource "google_compute_disk" "disk_c" {
+    provider = google-beta
+    name  = "%s"
+    size  = 30
+    type  = "pd-ssd"
+    zone  = "us-central1-a"
+  }
+  
+  resource "google_compute_instance" "vm" {
+    provider = google-beta
+    name         = "%s"
+    machine_type = "n1-standard-1"
+
+    boot_disk {
+      initialize_params {
+        image = "debian-cloud/debian-10"
+      }
+    }
+
+    labels = {
+      test = "override-attacheddisk"
+    }
+
+    network_interface {
+      network = "default"
+    }
+    attached_disk {
+      source = google_compute_disk.disk_a.self_link
+    }
+    attached_disk {
+      source = google_compute_disk.disk_b.self_link
+    }
+  }
+  
+  resource "google_compute_machine_image" "foobar" {
+    provider        = google-beta
+    name            = "%s"
+    source_instance = google_compute_instance.vm.self_link
+  }
+  
+  resource "google_compute_instance_from_machine_image" "foobar" {
+    provider = google-beta
+    name = "%s"
+    zone = "us-central1-a"
+    source_machine_image = google_compute_machine_image.foobar.self_link
+  
+    // Overrides
+    attached_disk {
+      source = google_compute_disk.disk_c.self_link
+    }
+  }
+`, instanceDiskA, instanceDiskB, overrideDisk, instanceName, instanceName, generatedInstanceName)
+}
+
+func testAccComputeInstanceFromMachineImage_overrideScratchDisk(instanceName, generatedInstanceName string) string {
+	return fmt.Sprintf(`
+resource "google_compute_instance" "vm" {
+  provider = google-beta
+  name         = "%s"
+  machine_type = "n1-standard-1"
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
+
+  labels = {
+    test = "override-attacheddisk"
+  }
+
+  scratch_disk {
+    interface    = "SCSI"
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_machine_image" "foobar" {
+  provider        = google-beta
+  name            = "%s"
+  source_instance = google_compute_instance.vm.self_link
+}
+
+resource "google_compute_instance_from_machine_image" "foobar" {
+  provider = google-beta
+  name = "%s"
+  zone = "us-central1-a"
+  source_machine_image = google_compute_machine_image.foobar.self_link
+
+  // Overrides
+  scratch_disk {
+    interface = "NVME"
+  }
+}
+`, instanceName, instanceName, generatedInstanceName)
+}
+
+func testAccComputeInstanceFromMachineImage_overrideMetadataDotStartupScript(instanceName, generatedInstanceName string) string {
+	return fmt.Sprintf(`
+resource "google_compute_instance" "vm" {
+  provider     = google-beta
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
+
+  name         = "%s"
+  machine_type = "n1-standard-1"
+
+  network_interface {
+    network = "default"
+  }
+
+  metadata = {
+    startup-script = "#!/bin/bash\necho Hello"
+  }
+
+}
+
+resource "google_compute_machine_image" "foobar" {
+  provider        = google-beta
+  name            = "%s"
+  source_instance = google_compute_instance.vm.self_link
+}
+
+resource "google_compute_instance_from_machine_image" "foobar" {
+  provider = google-beta
+  name = "%s"
+  zone = "us-central1-a"
+
+  source_machine_image = google_compute_machine_image.foobar.self_link
+
+  // Overrides
+  metadata = {
+    startup-script = ""
+  }
+}
+`, instanceName, instanceName, generatedInstanceName)
+}
+
+<% else %>
+// Magic Modules doesn't let us remove files - blank out beta-only common-compile files for now.
+<% end -%>
