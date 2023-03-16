@@ -22,11 +22,11 @@ def rescursive_search(current_field_parts, parent_field_yaml, field_override, fi
         if field_yaml['name'] == current_field:
             if len(current_field_parts) > 0:
                 if 'item_type' in parent_field_yaml[i] and type(parent_field_yaml[i]['item_type']) is not None:
-                    parent_field_yaml[i]['item_type']['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['item_type']['properties'], field_override)
+                    parent_field_yaml[i]['item_type']['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['item_type']['properties'], field_override, field_overrides_key)
                 elif 'value_type' in parent_field_yaml[i] and type(parent_field_yaml[i]['value_type']) is not None:
-                    parent_field_yaml[i]['value_type']['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['value_type']['properties'], field_override)
+                    parent_field_yaml[i]['value_type']['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['value_type']['properties'], field_override, field_overrides_key)
                 else:
-                    parent_field_yaml[i]['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['properties'], field_override)
+                    parent_field_yaml[i]['properties'] = rescursive_search(current_field_parts, parent_field_yaml[i]['properties'], field_override, field_overrides_key)
             else:
                 parent_field_yaml[i][field_overrides_key] = field_override
                 parent_field_yaml[i] = move_down('item_type', parent_field_yaml[i])
