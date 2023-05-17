@@ -57,10 +57,9 @@ examples:
       region_target_http_proxy_name: 'test-https-redirect-proxy'
       region_url_map_name: 'url-map'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: false
     immutable: true
     description: |

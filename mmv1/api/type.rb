@@ -541,7 +541,7 @@ module Api
           @item_type.set_variable(@__resource, :__resource)
           @item_type.set_variable(self, :__parent)
         end
-        check :item_type, type: [::String, NestedObject, ResourceRef, Enum], required: true
+        check :item_type, type: [::String, NestedObject, ResourceRef, Enum, String], required: true
 
         unless @item_type.is_a?(NestedObject) || @item_type.is_a?(ResourceRef) \
             || @item_type.is_a?(Enum) || type?(@item_type)

@@ -70,10 +70,9 @@ examples:
       neg_name: 'my-lb-neg'
       network_name: 'neg-network'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       Zone where the network endpoint group is located.
     required: false

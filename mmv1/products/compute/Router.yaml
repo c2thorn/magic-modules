@@ -63,10 +63,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   constants: templates/terraform/constants/router.go.erb
   resource_definition: templates/terraform/resource_definition/router.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: region
-    resource: Region
-    imports: name
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: Region where the router resides.
     immutable: true
     required: false

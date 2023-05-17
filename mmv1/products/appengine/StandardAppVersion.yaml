@@ -85,11 +85,10 @@ examples:
     test_env_vars:
       org_id: :ORG_ID
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'service'
     url_param_only: true
-    resource: 'Service'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: true
     description: |
       AppEngine service resource

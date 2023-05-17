@@ -84,10 +84,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   encoder: templates/terraform/encoders/vpn_tunnel.go.erb
   post_create: templates/terraform/post_create/labels.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description:
       'The region where the tunnel is located. If unset, is set to the region of
       `target_vpn_gateway`.'

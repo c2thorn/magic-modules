@@ -73,10 +73,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   update_encoder: templates/terraform/update_encoder/reservation.go.erb
   pre_update: templates/terraform/pre_update/shared_reservation_update.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The zone where the reservation is made.
     required: true

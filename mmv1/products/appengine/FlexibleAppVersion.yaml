@@ -84,12 +84,11 @@ examples:
       org_id: :ORG_ID
       billing_account: :BILLING_ACCT
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'service'
     required: true
     url_param_only: true
-    resource: 'Service'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       AppEngine service resource. Can contain numbers, letters, and hyphens.
 properties:

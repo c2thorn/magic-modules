@@ -98,10 +98,9 @@ iam_policy: !ruby/object:Api::Resource::IamPolicy
     ['projects/{{project}}/regions/{{region}}/disks/{{name}}', '{{name}}']
   base_url: projects/{{project}}/regions/{{region}}/disks/{{name}}
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to the region where the disk resides.'
     required: false
     default_from_api: true
@@ -273,16 +272,14 @@ properties:
     min_size: 2
     max_size: 2
     required: true
-    item_type: !ruby/object:Api::Type::ResourceRef
+    item_type: !ruby/object:Api::Type::String
       name: 'zone'
-      resource: 'Zone'
-      imports: 'selfLink'
+      diff_suppress_func: 'compareSelfLinkOrResourceName'
       description: |
         A reference to a zone where the disk should be replicated to.
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'type'
-    resource: 'RegionDiskType'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the disk type resource describing which disk type to use to
       create the disk. Provide this when creating the disk.

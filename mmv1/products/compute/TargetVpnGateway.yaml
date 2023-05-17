@@ -59,10 +59,9 @@ examples:
       vpn_tunnel_name: 'tunnel1'
       route_name: 'route1'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The region this gateway should sit in.
     required: false

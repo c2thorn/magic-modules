@@ -56,10 +56,9 @@ examples:
       target_pool_name: 'my-target-pool'
       rigm_name: 'my-region-igm'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the region where the instance group resides.
     required: false
@@ -399,9 +398,6 @@ properties:
                 A description of a scaling schedule.
   - !ruby/object:Api::Type::String
     name: 'target'
-    # TODO(#303): resourceref once RegionIGM exists
-    # resource: 'RegionInstanceGroupManager'
-    # imports: 'selfLink'
     description: |
       URL of the managed instance group that this autoscaler will scale.
     required: true

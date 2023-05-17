@@ -60,10 +60,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   post_create: templates/terraform/post_create/interconnect_attachment.go.erb
   pre_delete: templates/terraform/pre_delete/interconnect_attachment.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: false
     description: |
       Region where the regional interconnect attachment resides.

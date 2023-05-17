@@ -71,10 +71,9 @@ examples:
 custom_code: !ruby/object:Provider::Terraform::CustomCode
   update_encoder: 'templates/terraform/update_encoder/compute_service_attachment.go.erb'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the region where the resource resides.
     required: false

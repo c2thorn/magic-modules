@@ -243,10 +243,9 @@ properties:
     description: The private IPv6 google access type for the VMs in this subnet.
     fingerprint_name: 'fingerprint'
     default_from_api: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The GCP region for this subnetwork.
     required: false

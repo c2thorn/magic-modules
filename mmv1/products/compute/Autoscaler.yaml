@@ -76,10 +76,9 @@ examples:
       target_pool_name: 'my-target-pool'
       igm_name: 'my-igm'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the zone where the instance group resides.
     required: false
@@ -419,10 +418,9 @@ properties:
               name: 'description'
               description: |
                 A description of a scaling schedule.
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'target'
-    resource: 'InstanceGroupManager'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the managed instance group that this autoscaler will scale.
     required: true

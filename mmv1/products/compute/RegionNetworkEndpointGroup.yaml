@@ -85,10 +85,9 @@ examples:
       service_attachment_name: 'psc-service-attachment'
       health_check_name: 'psc-healthcheck'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       A reference to the region where the Serverless NEGs Reside.
     required: true

@@ -52,10 +52,9 @@ examples:
       region_backend_service_name: 'backend-service'
       region_health_check_name: 'http-health-check'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     immutable: true
     required: false
     description: |

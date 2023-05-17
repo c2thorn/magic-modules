@@ -53,10 +53,9 @@ examples:
       context[\"random_suffix\"\
       ])"
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to the zone where the machine resides.'
     required: true
 properties:
@@ -163,14 +162,13 @@ properties:
               name: 'diskSizeGb'
               description: Specifies the size of the disk in base-2 GB.
             # diskStorageType - deprecated
-            - !ruby/object:Api::Type::ResourceRef
+            - !ruby/object:Api::Type::String
               name: 'diskType'
               description: |
                 Reference to a disk type.
                 Specifies the disk type to use to create the instance.
                 If not specified, the default is pd-standard.
-              resource: 'DiskType'
-              imports: 'selfLink'
+              diff_suppress_func: 'compareSelfLinkOrResourceName'
             - !ruby/object:Api::Type::String
               name: 'sourceImage'
               description: |
@@ -324,14 +322,12 @@ properties:
       The metadata key/value pairs to assign to instances that are
       created from this template. These pairs can consist of custom
       metadata or predefined keys.
-  - !ruby/object:Api::Type::ResourceRef
-    name: 'machineType'
-    resource: 'MachineType'
-    imports: 'selfLink'
+  - !ruby/object:Api::Type::String
+    name: 'machineType'      
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to a machine type which defines VM kind.'
     update_url: projects/{{project}}/zones/{{zone}}/instances/{{name}}/setMachineType
     update_verb: :POST
-  # TODO(alexstephen): Add metadata
   - !ruby/object:Api::Type::String
     name: 'minCpuPlatform'
     description: |

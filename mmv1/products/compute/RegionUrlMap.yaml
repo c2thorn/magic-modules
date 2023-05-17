@@ -131,10 +131,9 @@ examples:
     skip_test: true  # Similar to other samples
     min_version: beta
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The Region in which the url map should reside.
       If it is not provided, the provider region is used.

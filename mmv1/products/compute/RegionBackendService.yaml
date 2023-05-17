@@ -112,10 +112,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   decoder: templates/terraform/decoders/region_backend_service.go.erb
   resource_definition: 'templates/terraform/resource_definition/region_backend_service.go.erb'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The Region in which the created backend service should reside.
       If it is not provided, the provider region is used.

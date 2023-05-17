@@ -104,10 +104,9 @@ properties:
         # to interpret "not set" as "use the name in state".
     default_from_api: true
     custom_flatten: 'templates/terraform/custom_flatten/name_from_self_link.erb'
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'config'
-    resource: 'InstanceConfig'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The name of the instance's configuration (similar but not
       quite the same as a region) which defines the geographic placement and

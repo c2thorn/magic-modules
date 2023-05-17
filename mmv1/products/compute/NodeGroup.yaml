@@ -75,10 +75,9 @@ examples:
 custom_code: !ruby/object:Provider::Terraform::CustomCode
   pre_create: templates/terraform/pre_create/compute_node_group_url_replace.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: false
     description: |
       Zone where this node group is located

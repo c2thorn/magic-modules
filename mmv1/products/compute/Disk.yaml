@@ -97,10 +97,9 @@ iam_policy: !ruby/object:Api::Resource::IamPolicy
     ['projects/{{project}}/zones/{{zone}}/disks/{{name}}', '{{name}}']
   base_url: projects/{{project}}/zones/{{zone}}/disks/{{name}}
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to the zone where the disk resides.'
     required: false
     default_from_api: true
@@ -377,10 +376,9 @@ properties:
       be used to determine whether the image was taken from the current
       or a previous instance of a given disk name.
     output: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'type'
-    resource: 'DiskType'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the disk type resource describing which disk type to use to
       create the disk. Provide this when creating the disk.

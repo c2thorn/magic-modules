@@ -115,10 +115,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   post_update: templates/terraform/post_update/compute_region_per_instance_config.go.erb
   custom_delete: templates/terraform/custom_delete/region_per_instance_config.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       Region where the containing instance group manager is located
     required: false
@@ -126,10 +125,9 @@ parameters:
     immutable: true
     ignore_read: true
     default_from_api: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'regionInstanceGroupManager'
-    resource: 'RegionInstanceGroupManager'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The region instance group manager this instance config is part of.
     required: true

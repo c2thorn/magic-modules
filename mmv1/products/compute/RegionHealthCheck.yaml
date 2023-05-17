@@ -122,10 +122,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   encoder: templates/terraform/encoders/health_check_type.erb
   resource_definition: templates/terraform/resource_definition/health_check.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     immutable: true
     description: |
       The Region in which the created health check should reside.

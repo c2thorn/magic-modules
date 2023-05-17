@@ -56,10 +56,9 @@ examples:
     vars:
       template_name: 'soletenant-with-licenses'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'selfLink'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: false
     description: |
       Region where nodes using the node template will be created.

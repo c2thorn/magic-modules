@@ -93,10 +93,9 @@ parameters:
     required: true
     # ignore_read in providers - this is only used in Create
     diff_suppress_func: 'tpgresource.CompareSelfLinkOrResourceName'
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to the zone where the disk is hosted.'
     immutable: true
     ignore_read: true
@@ -228,10 +227,9 @@ properties:
       can be because the original image had licenses attached (such as a
       Windows image).  snapshotEncryptionKey nested object Encrypts the
       snapshot using a customer-supplied encryption key.
-    item_type: !ruby/object:Api::Type::ResourceRef
+    item_type: !ruby/object:Api::Type::String
       name: 'license'
-      resource: 'License'
-      imports: 'selfLink'
+      diff_suppress_func: 'compareSelfLinkOrResourceName'
       description: 'A reference to a license associated with this snapshot'
   - !ruby/object:Api::Type::KeyValuePairs
     name: 'labels'

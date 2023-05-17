@@ -62,10 +62,9 @@ examples:
       target_name: 'custom-network'
       instance_name: 'custom-network-target-vm'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       URL of the zone where the target instance resides.
     required: false

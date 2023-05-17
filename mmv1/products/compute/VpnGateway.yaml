@@ -88,10 +88,9 @@ examples:
       router_name: 'test-router'
       network_name: 'test-network'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The region this gateway should sit in.
     required: false

@@ -70,10 +70,9 @@ parameters:
       The name of the disk in which the resource policies are attached to.
     required: true
     url_param_only: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: 'A reference to the zone where the disk resides.'
     required: false
     url_param_only: true

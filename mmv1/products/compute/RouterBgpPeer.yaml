@@ -99,10 +99,9 @@ parameters:
     required: true
     immutable: true
     url_param_only: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: region
-    resource: Region
-    imports: name
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       Region where the router and BgpPeer reside.
       If it is not provided, the provider region is used.

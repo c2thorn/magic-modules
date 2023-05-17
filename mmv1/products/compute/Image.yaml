@@ -186,11 +186,10 @@ properties:
     name: 'licenses'
     description: Any applicable license URI.
     default_from_api: true
-    item_type: !ruby/object:Api::Type::ResourceRef
+    item_type: !ruby/object:Api::Type::String
       name: 'license'
       description: 'An applicable license URI'
-      resource: 'License'
-      imports: 'selfLink'
+      diff_suppress_func: 'compareSelfLinkOrResourceName'
   - !ruby/object:Api::Type::String
     name: 'name'
     description: |

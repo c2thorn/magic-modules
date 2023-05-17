@@ -81,10 +81,9 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   decoder: templates/terraform/decoders/unwrap_resource.go.erb
   encoder: templates/terraform/encoders/compute_network_endpoint.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       Zone where the containing network endpoint group is located.
     required: false

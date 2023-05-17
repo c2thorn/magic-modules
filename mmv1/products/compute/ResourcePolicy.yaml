@@ -77,10 +77,9 @@ examples:
     vars:
       name: 'gce-policy'
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: region
-    resource: Region
-    imports: name
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: Region where resource policy resides.
     immutable: true
     required: false

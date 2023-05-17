@@ -80,10 +80,9 @@ examples:
 custom_code: !ruby/object:Provider::Terraform::CustomCode
   extra_schema_entry: templates/terraform/extra_schema_entry/ssl_certificate.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'region'
-    resource: 'Region'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     required: false
     immutable: true
     description: |

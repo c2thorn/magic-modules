@@ -114,20 +114,18 @@ custom_code: !ruby/object:Provider::Terraform::CustomCode
   post_update: templates/terraform/post_update/compute_per_instance_config.go.erb
   custom_delete: templates/terraform/custom_delete/per_instance_config.go.erb
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'zone'
-    resource: 'Zone'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       Zone where the containing instance group manager is located
     required: false
     url_param_only: true
     immutable: true
     ignore_read: true
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'instanceGroupManager'
-    resource: 'InstanceGroupManager'
-    imports: 'name'
+    diff_suppress_func: 'compareSelfLinkOrResourceName'
     description: |
       The instance group manager this instance config is part of.
     required: true
