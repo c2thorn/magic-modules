@@ -109,12 +109,6 @@ properties:
       - :IPV4
       - :IPV6
     diff_suppress_func: 'tpgresource.EmptyOrDefaultStringSuppress("IPV4")'
-  - !ruby/object:Api::Type::String
-    name: 'region'
-    diff_suppress_func: 'compareSelfLinkOrResourceName'
-    description: |
-      A reference to the region where the regional address resides.
-    output: true
   - !ruby/object:Api::Type::Integer
     name: 'prefixLength'
     description: |

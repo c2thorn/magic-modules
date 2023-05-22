@@ -1246,6 +1246,7 @@ properties:
           connections to backends of a service. This resource itself does not affect
           configuration unless it is attached to a backend service resource.
         required: true
+        custom_flatten: templates/terraform/custom_flatten/guard_self_link.go.erb
       - !ruby/object:Api::Type::Array
         name: 'subjectAltNames'
         description: |

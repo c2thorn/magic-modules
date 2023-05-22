@@ -55,6 +55,8 @@ parameters:
     immutable: true
     description: |
       The region where the regional SSL policy resides.
+    custom_flatten: templates/terraform/custom_flatten/guard_self_link.go.erb
+    custom_expand: templates/terraform/custom_expand/parse_reference.go.erb
 properties:
   - !ruby/object:Api::Type::Time
     name: 'creationTimestamp'

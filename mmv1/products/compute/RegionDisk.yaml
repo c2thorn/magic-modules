@@ -360,8 +360,8 @@ properties:
     description: Any applicable license URI.
     default_from_api: true
     immutable: true
-    item_type: !ruby/object:Api::Type::ResourceRef
+    item_type: !ruby/object:Api::Type::String
       name: 'license'
       description: 'An applicable license URI'
-      resource: 'License'
-      imports: 'selfLink'
+      diff_suppress_func: 'compareSelfLinkOrResourceName'
+      custom_expand: templates/terraform/custom_expand/parse_reference.go.erb

@@ -79,6 +79,8 @@ parameters:
     required: false
     immutable: true
     default_from_api: true
+    custom_flatten: templates/terraform/custom_flatten/guard_self_link.go.erb
+    custom_expand: templates/terraform/custom_expand/parse_reference.go.erb
 properties:
   - !ruby/object:Api::Type::String
     name: 'name'
