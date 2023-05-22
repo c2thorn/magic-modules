@@ -424,4 +424,4 @@ properties:
     description: |
       URL of the managed instance group that this autoscaler will scale.
     required: true
-    custom_expand: 'templates/terraform/custom_expand/compute_full_url.erb'
+    custom_expand: 'templates/terraform/custom_expand/compute_autoscaler_target.go.erb'
