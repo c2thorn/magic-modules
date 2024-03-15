@@ -445,18 +445,6 @@ module Api
       end
     end
 
-    def kind?
-      !@kind.nil?
-    end
-
-    def encoder?
-      !@transport&.encoder.nil?
-    end
-
-    def decoder?
-      !@transport&.decoder.nil?
-    end
-
     def add_labels_related_fields(props, parent)
       props.each do |p|
         if p.is_a? Api::Type::KeyValueLabels
@@ -635,9 +623,9 @@ Please refer to the field `effective_#{title}` for all of the #{title} present o
       @base_url
     end
 
-    def full_create_url
-      [@__product.base_url, create_uri].flatten.join
-    end
+    # def full_create_url
+    #   [@__product.base_url, create_uri].flatten.join
+    # end
 
     def create_uri
       if @create_url.nil?
@@ -651,9 +639,9 @@ Please refer to the field `effective_#{title}` for all of the #{title} present o
       end
     end
 
-    def full_delete_url
-      [@__product.base_url, delete_uri].flatten.join
-    end
+    # def full_delete_url
+    #   [@__product.base_url, delete_uri].flatten.join
+    # end
 
     def delete_uri
       if @delete_url.nil?

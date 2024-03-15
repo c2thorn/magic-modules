@@ -287,7 +287,7 @@ final_product = products_for_version.last
 provider = final_product[:provider]
 
 provider&.copy_common_files(output_path, generate_code, generate_docs)
-Google::LOGGER.info "Compiling common files for #{provider_name}"
+Google::LOGGER.info "Compiling common files for #{provider_name} #{Api::Type::String::NAME.name}"
 common_compile_file = "provider/#{provider_name}/common~compile.yaml"
 if generate_code
   provider&.compile_common_files(

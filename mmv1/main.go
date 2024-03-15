@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -122,8 +123,8 @@ func main() {
 				yamlValidator.Parse(resourceYaml, resource)
 
 				// TODO Q1: remove these lines, which are for debugging
-				// res, _ := json.Marshal(resource)
-				// log.Printf("resource %s", string(res))
+				res, _ := json.Marshal(resource)
+				log.Printf("resource %s", string(res))
 
 				// TODO Q1: add labels related fields
 
