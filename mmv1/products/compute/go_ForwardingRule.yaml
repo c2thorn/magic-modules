@@ -32,6 +32,7 @@ timeouts:
   update_minutes: 20
   delete_minutes: 20
 async:
+  actions: ['create', 'delete', 'update']
   type: 'OpAsync'
   operation:
     base_url: 'projects/{{project}}/regions/{{region}}/operations/{{op_id}}'
@@ -479,6 +480,15 @@ properties:
     update_verb: 'POST'
     diff_suppress_func: 'tpgresource.CompareSelfLinkRelativePaths'
     custom_expand: 'templates/terraform/custom_expand/go/self_link_from_name.tmpl'
+  - name: 'labelFingerprint'
+    type: Fingerprint
+    description: |
+      The fingerprint used for optimistic locking of this resource.  Used
+      internally during updates.
+    output: true
+    update_url: 'projects/{{project}}/regions/{{region}}/forwardingRules/{{name}}/setLabels'
+    update_verb: 'POST'
+    key_expander: ''
   - name: 'allowGlobalAccess'
     type: Boolean
     description: |
@@ -498,18 +508,8 @@ properties:
     type: KeyValueLabels
     description: |
       Labels to apply to this forwarding rule.  A list of key->value pairs.
-    immutable: false
     update_url: 'projects/{{project}}/regions/{{region}}/forwardingRules/{{name}}/setLabels'
     update_verb: 'POST'
-  - name: 'labelFingerprint'
-    type: Fingerprint
-    description: |
-      The fingerprint used for optimistic locking of this resource.  Used
-      internally during updates.
-    output: true
-    update_url: 'projects/{{project}}/regions/{{region}}/forwardingRules/{{name}}/setLabels'
-    update_verb: 'POST'
-    key_expander: ''
   - name: 'allPorts'
     type: Boolean
     description: |
