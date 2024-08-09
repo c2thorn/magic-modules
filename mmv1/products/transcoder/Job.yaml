@@ -13,7 +13,7 @@
 
 --- !ruby/object:Api::Resource
 name: "Job"
-self_link: "projects/{{project}}/locations/{{location}}/jobs/{{name}}"
+self_link: "{{name}}"
 base_url: "projects/{{project}}/locations/{{location}}/jobs"
 create_url: "projects/{{project}}/locations/{{location}}/jobs"
 update_verb: :PATCH
@@ -23,7 +23,7 @@ references: !ruby/object:Api::Resource::ReferenceLinks
   guides:
     "Transcoder": "https://cloud.google.com/transcoder/docs/"
   api: "https://cloud.google.com/transcoder/docs/reference/rest/v1/projects.locations.jobs"
-import_format: ["projects/{{project}}/locations/{{location}}/jobs/{{name}}"]
+import_format: ["{{name}}"]
 examples:
   - !ruby/object:Provider::Terraform::Examples
     name: "transcoder_job_basic"
@@ -45,7 +45,7 @@ properties:
     name: "name"
     description: |
       The resource name of the job.
-    required: true
+    output: true
   - !ruby/object:Api::Type::String
     name: "inputUri"
     description: |
