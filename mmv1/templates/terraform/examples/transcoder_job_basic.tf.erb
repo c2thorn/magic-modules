@@ -14,7 +14,6 @@ resource "google_storage_bucket_object" "example_mp4" {
 }
 
 resource "google_transcoder_job" "<%= ctx[:primary_resource_id] %>" {
-  name        = "<%= ctx[:vars]['job_name'] %>"
   template_id = google_transcoder_job_template.default.name
   location    = "us-central1"
 
