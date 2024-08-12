@@ -1200,9 +1200,6 @@ func buildDisks(d *schema.ResourceData, config *transport_tpg.Config) ([]*comput
 
 		// Build the disk
 		var disk compute.AttachedDisk
-		disk.Type = "PERSISTENT"
-		disk.Mode = "READ_WRITE"
-		disk.Interface = "SCSI"
 		disk.Boot = i == 0
 		disk.AutoDelete = d.Get(prefix + ".auto_delete").(bool)
 
