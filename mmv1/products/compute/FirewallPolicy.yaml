@@ -47,6 +47,11 @@ properties:
       Creation timestamp in RFC3339 text format.
     output: true
   - !ruby/object:Api::Type::String
+    name: 'firewallPolicyId'
+    description: |
+      The unique identifier for the resource. This identifier is defined by the server.
+    output: true
+  - !ruby/object:Api::Type::String
     name: 'name'
     description: |
       Name of the resource. It is a numeric ID allocated by GCP which uniquely identifies the Firewall Policy.
