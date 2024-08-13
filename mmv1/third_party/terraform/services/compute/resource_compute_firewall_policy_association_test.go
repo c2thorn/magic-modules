@@ -37,18 +37,13 @@ func TestAccComputeFirewallPolicyAssociation_basic(t *testing.T) {
 
 func testAccComputeFirewallPolicyAssociation_basic(context map[string]interface{}) string {
 	return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_folder" "target_folder" {
   display_name = "tf-test-target-%{random_suffix}"
   parent       = "%{org_name}"
 }
 
 resource "google_compute_firewall_policy" "default" {
-  parent      = google_folder.folder.id
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
