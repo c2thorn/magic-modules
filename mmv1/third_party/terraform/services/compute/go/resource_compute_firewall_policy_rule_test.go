@@ -149,11 +149,6 @@ func TestAccComputeFirewallPolicyRule_securityProfileGroup_update(t *testing.T) 
 
 func testAccComputeFirewallPolicyRule_securityProfileGroup_basic(context map[string]interface{}) string {
   return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_network_security_security_profile" "security_profile" {
     name     = "tf-test-my-sp%{random_suffix}"
     type     = "THREAT_PREVENTION"
@@ -170,7 +165,7 @@ resource "google_network_security_security_profile_group" "security_profile_grou
 }
 
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -198,11 +193,6 @@ resource "google_compute_firewall_policy_rule" "fw_policy_rule1" {
 
 func testAccComputeFirewallPolicyRule_securityProfileGroup_update(context map[string]interface{}) string {
   return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_network_security_security_profile" "security_profile" {
     name     = "tf-test-my-sp%{random_suffix}"
     type     = "THREAT_PREVENTION"
@@ -227,7 +217,7 @@ resource "google_network_security_security_profile_group" "security_profile_grou
 }
 
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -273,13 +263,8 @@ resource "google_compute_network" "network2" {
   auto_create_subnetworks = false
 }
 
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -338,13 +323,8 @@ resource "google_compute_network" "network2" {
   auto_create_subnetworks = false
 }
 
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -413,13 +393,8 @@ resource "google_compute_network" "network2" {
   auto_create_subnetworks = false
 }
 
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.id
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -464,13 +439,8 @@ resource "google_compute_firewall_policy_rule" "fw_policy_rule1" {
 
 func testAccComputeFirewallPolicyRule_multiple(context map[string]interface{}) string {
 	return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }
@@ -536,13 +506,8 @@ resource "google_compute_firewall_policy_rule" "fw_policy_rule2" {
 
 func testAccComputeFirewallPolicyRule_multipleAdd(context map[string]interface{}) string {
 	return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.id
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Description Update"
 }
@@ -629,13 +594,8 @@ resource "google_compute_firewall_policy_rule" "fw_policy_rule3" {
 
 func testAccComputeFirewallPolicyRule_multipleRemove(context map[string]interface{}) string {
 	return acctest.Nprintf(`
-resource "google_folder" "folder" {
-  display_name = "tf-test-folder-%{random_suffix}"
-  parent       = "%{org_name}"
-}
-
 resource "google_compute_firewall_policy" "fw_policy" {
-  parent      = google_folder.folder.name
+  parent      = "%{org_name}"
   short_name  = "tf-test-policy-%{random_suffix}"
   description = "Resource created for Terraform acceptance testing"
 }

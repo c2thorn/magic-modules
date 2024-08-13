@@ -14,7 +14,6 @@ func TestAccComputeFirewallPolicy_update(t *testing.T) {
 
 	org := envvar.GetTestOrgFromEnv(t)
 	policyName := fmt.Sprintf("tf-test-firewall-policy-%s", acctest.RandString(t, 10))
-	folderName := fmt.Sprintf("tf-test-folder-%s", acctest.RandString(t, 10))
 
 	acctest.VcrTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -22,7 +21,7 @@ func TestAccComputeFirewallPolicy_update(t *testing.T) {
 		CheckDestroy:             testAccCheckComputeFirewallDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccComputeFirewallPolicy_basic(org, policyName, folderName),
+				Config: testAccComputeFirewallPolicy_basic(org, policyName),
 			},
 			{
 				ResourceName:      "google_compute_firewall_policy.default",
@@ -30,7 +29,7 @@ func TestAccComputeFirewallPolicy_update(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccComputeFirewallPolicy_update(org, policyName, folderName),
+				Config: testAccComputeFirewallPolicy_update(org, policyName),
 			},
 			{
 				ResourceName:      "google_compute_firewall_policy.default",
@@ -38,7 +37,7 @@ func TestAccComputeFirewallPolicy_update(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccComputeFirewallPolicy_update(org, policyName, folderName),
+				Config: testAccComputeFirewallPolicy_update(org, policyName),
 			},
 			{
 				ResourceName:      "google_compute_firewall_policy.default",
@@ -49,32 +48,22 @@ func TestAccComputeFirewallPolicy_update(t *testing.T) {
 	})
 }
 
-func testAccComputeFirewallPolicy_basic(org, policyName, folderName string) string {
+func testAccComputeFirewallPolicy_basic(org, policyName string) string {
   return fmt.Sprintf(`
-resource "google_folder" "folder" {
-  display_name = "%s"
-  parent       = "%s"
-}
-
 resource "google_compute_firewall_policy" "default" {
-  parent      = google_folder.folder.name
+  parent      = "%s"
   short_name  = "%s"
   description = "Resource created for Terraform acceptance testing"
 }
-`, folderName, "organizations/"+org, policyName)
+`, "organizations/"+org, policyName)
 }
 
-func testAccComputeFirewallPolicy_update(org, policyName, folderName string) string {
+func testAccComputeFirewallPolicy_update(org, policyName string) string {
   return fmt.Sprintf(`
-resource "google_folder" "folder" {
-  display_name = "%s"
-  parent       = "%s"
-}
-
 resource "google_compute_firewall_policy" "default" {
-  parent      = google_folder.folder.id
+  parent      = "%s"
   short_name  = "%s"
   description = "An updated description"
 }
-`, folderName, "organizations/"+org, policyName)
+`, "organizations/"+org, policyName)
 }
