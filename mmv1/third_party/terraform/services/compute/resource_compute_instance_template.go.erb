@@ -1605,10 +1605,6 @@ func reorderDisks(configDisks []interface{}, apiDisks []map[string]interface{}) 
 			disksByDeviceName[v.(string)] = i
 		} else if v := disk["type"]; v.(string) == "SCRATCH" {
 			iface := disk["interface"].(string)
-			if iface == "" {
-				// apply-time default
-				iface = "SCSI"
-			}
 			scratchDisksByInterface[iface] = append(scratchDisksByInterface[iface], i)
 		} else if v := disk["source"]; v.(string) != "" {
 			attachedDisksBySource[v.(string)] = i
