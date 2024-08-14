@@ -141,6 +141,7 @@ properties:
     description: |
       Specify the templateId to use for populating Job.config.
       The default is preset/web-hd, which is the only supported preset.
+    default_from_api: true
   - !ruby/object:Api::Type::NestedObject
     name: "config"
     description: |
