@@ -16,8 +16,7 @@ name: "JobTemplate"
 self_link: "projects/{{project}}/locations/{{location}}/jobTemplates/{{job_template_id}}"
 base_url: "projects/{{project}}/locations/{{location}}/jobTemplates"
 create_url: "projects/{{project}}/locations/{{location}}/jobTemplates?jobTemplateId={{job_template_id}}"
-update_verb: :PATCH
-update_mask: true
+immutable: true
 description: "Transcoding Job Template Resource"
 references: !ruby/object:Api::Resource::ReferenceLinks
   guides:

@@ -16,8 +16,7 @@ name: "Job"
 self_link: "{{name}}"
 base_url: "projects/{{project}}/locations/{{location}}/jobs"
 create_url: "projects/{{project}}/locations/{{location}}/jobs"
-update_verb: :PATCH
-update_mask: true
+immutable: true
 description: "Transcoding Job Resource"
 references: !ruby/object:Api::Resource::ReferenceLinks
   guides:
@@ -85,6 +84,7 @@ properties:
       Job time to live value in days, which will be effective after job completion.
       Job should be deleted automatically after the given TTL.
       Enter a value between 1 and 90. The default is 30.
+    default_from_api: true
   - !ruby/object:Api::Type::KeyValueLabels
     name: "labels"
     description: |
@@ -103,12 +103,17 @@ properties:
         name: "message"
         description: |
           A developer-facing error message.
-      - !ruby/object:Api::Type::Array
-        name: "details"
-        description: |
-          A list of messages that carry the error details.
-        item_type: Api::Type::KeyValuePairs
-        output: true
+      - !ruby/object:Api::Type::String
+          name: 'details'
+          description: |
+            A list of messages that carry the error details.
+          custom_expand: 'templates/terraform/custom_expand/json_schema.erb'
+          custom_flatten: 'templates/terraform/custom_flatten/json_schema.erb'
+          state_func:
+            'func(v interface{}) string { s, _ :=
+            structure.NormalizeJsonString(v); return s }'
+          validation: !ruby/object:Provider::Terraform::Validation
+            function: 'validation.StringIsJSON'
   - !ruby/object:Api::Type::Enum
     name: "mode"
     description: |
@@ -130,6 +135,7 @@ properties:
       - :OPTIMIZATION_STRATEGY_UNSPECIFIED
       - :AUTODETECT
       - :DISABLED
+    default_from_api: true
   - !ruby/object:Api::Type::String
     name: "templateId"
     description: |
@@ -139,6 +145,7 @@ properties:
     name: "config"
     description: |
       The configuration for this job.
+    default_from_api: true
     properties:
       - !ruby/object:Api::Type::Array
         name: "inputs"
