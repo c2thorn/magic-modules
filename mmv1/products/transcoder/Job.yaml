@@ -23,6 +23,8 @@ references: !ruby/object:Api::Resource::ReferenceLinks
     "Transcoder": "https://cloud.google.com/transcoder/docs/"
   api: "https://cloud.google.com/transcoder/docs/reference/rest/v1/projects.locations.jobs"
 import_format: ["{{name}}"]
+custom_code: !ruby/object:Provider::Terraform::CustomCode
+  custom_import: templates/terraform/custom_import/self_link_as_name.erb
 examples:
   - !ruby/object:Provider::Terraform::Examples
     name: "transcoder_job_basic"
