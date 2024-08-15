@@ -39,6 +39,7 @@ examples:
     primary_resource_id: "default"
     vars:
       job_template_id: "example-job-template"
+      secret_manager_secret_id: "transcoder-encryption-key"
   - !ruby/object:Provider::Terraform::Examples
     name: "transcoder_job_template_pubsub"
     primary_resource_id: "default"

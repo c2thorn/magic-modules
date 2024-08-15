@@ -1,5 +1,5 @@
 resource "google_secret_manager_secret" "encryption_key" {
-  secret_id = "encryption-key"
+  secret_id = "<%= ctx[:vars]['secret_manager_secret_id'] %>"
   replication {
     auto {}
   }
