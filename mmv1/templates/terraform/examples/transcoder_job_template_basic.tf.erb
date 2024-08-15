@@ -11,6 +11,9 @@ resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
       inputs            = ["input0"]
       start_time_offset = "0s"
     }
+    ad_breaks {
+      start_time_offset = "3.500s"
+    }
     elementary_streams {
       key = "video-stream0"
       video_stream {
@@ -75,7 +78,6 @@ resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
       elementary_streams = ["video-stream1", "audio-stream0"]
     }
   }
-
   labels = {
     "label" = "key"
   }
