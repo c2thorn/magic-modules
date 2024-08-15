@@ -1,11 +1,25 @@
-resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
-  job_template_id = "<%= ctx[:vars]['job_template_id'] %>"
-  location = "us-central1"
+resource "google_storage_bucket" "default" {
+  name          = "<%= ctx[:vars]['bucket_name'] %>"
+  location      = "US"
+  force_destroy = true
+
+  uniform_bucket_level_access = true
+  public_access_prevention = "enforced"
+}
+
+resource "google_storage_bucket_object" "example_mp4" {
+  name   = "example.mp4"
+  source = "./test-fixtures/example.mp4"
+  bucket = google_storage_bucket.default.name
+}
+
+resource "google_transcoder_job" "<%= ctx[:primary_resource_id] %>" {
+  location    = "us-central1"
 
   config {
     inputs {
       key = "input0"
-      uri = "gs://example/example.mp4"
+      uri = "gs://${google_storage_bucket.default.name}/${google_storage_bucket_object.example_mp4.name}"
     }
 
     edit_list {
@@ -13,7 +27,7 @@ resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
       start_time_offset = "0s"
       inputs            = ["input0"]
     }
-    
+
     ad_breaks {
       start_time_offset = "3.500s"
     }
@@ -60,7 +74,7 @@ resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
         }
       }
     }
-
+    
     elementary_streams {
       key = "audio-stream0"
       audio_stream {
@@ -134,7 +148,7 @@ resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {
     }
 
     output {
-      uri = "gs://example/outputs/"
+      uri = "gs://${google_storage_bucket.default.name}/outputs/"
     }
   }
   labels = {

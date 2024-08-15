@@ -35,6 +35,44 @@ examples:
     ignore_read_extra:
       - 'state'
       - 'end_time'
+  - !ruby/object:Provider::Terraform::Examples
+    name: "transcoder_job_pubsub"
+    primary_resource_id: "default"
+    vars:
+      job_template_id: "example-job-template"
+      bucket_name: "transcoder-job"
+      pub_sub_topic_name: "transcoder-notifications"
+    ignore_read_extra:
+      - 'state'
+      - 'end_time'
+  - !ruby/object:Provider::Terraform::Examples
+    name: "transcoder_job_encryptions"
+    primary_resource_id: "default"
+    vars:
+      job_template_id: "example-job-template"
+      bucket_name: "transcoder-job"
+      secret_manager_secret_id: "transcoder-encryption-key"
+    ignore_read_extra:
+      - 'state'
+      - 'end_time'
+  - !ruby/object:Provider::Terraform::Examples
+    name: "transcoder_job_overlays"
+    primary_resource_id: "default"
+    vars:
+      job_template_id: "example-job-template"
+      bucket_name: "transcoder-job"
+    ignore_read_extra:
+      - 'state'
+      - 'end_time'
+  - !ruby/object:Provider::Terraform::Examples
+    name: "transcoder_job_manifests"
+    primary_resource_id: "default"
+    vars:
+      job_template_id: "example-job-template"
+      bucket_name: "transcoder-job"
+    ignore_read_extra:
+      - 'state'
+      - 'end_time'
 parameters:
   - !ruby/object:Api::Type::String
     name: "location"
