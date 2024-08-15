@@ -1,5 +1,5 @@
 resource "google_pubsub_topic" "transcoder_notifications" {
-  name = "transcoder-notifications"
+  name = "<%= ctx[:vars]['pub_sub_topic_name'] %>"
 }
 
 resource "google_transcoder_job_template" "<%= ctx[:primary_resource_id] %>" {

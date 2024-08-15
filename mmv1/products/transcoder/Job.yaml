@@ -124,11 +124,13 @@ properties:
       - :PROCESSING_MODE_UNSPECIFIED
       - :PROCESSING_MODE_INTERACTIVE
       - :PROCESSING_MODE_BATCH
+    default_from_api: true
   - !ruby/object:Api::Type::Integer
     name: "batchModePriority"
     description: |
       The processing priority of a batch job. This field can only be set for batch mode jobs.
       The default value is 0. This value cannot be negative. Higher values correspond to higher priorities for the job.
+    default_from_api: true
   - !ruby/object:Api::Type::Enum
     name: "optimization"
     description: |
@@ -155,26 +157,31 @@ properties:
         name: "inputs"
         description: |
           List of input assets stored in Cloud Storage.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
               name: "key"
               description: |
                 A unique key for this input. Must be specified when using advanced mapping and edit lists.
+              default_from_api: true
             - !ruby/object:Api::Type::String
               name: "uri"
               description: |
                 URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, gs://bucket/inputs/file.mp4).
                 If empty, the value is populated from Job.input_uri.
+              default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "preprocessingConfig"
               description: |
                 Preprocessing configurations.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::NestedObject
                   name: "color"
                   description: |
                     Color preprocessing configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "saturation"
@@ -195,6 +202,7 @@ properties:
                   name: "denoise"
                   description: |
                     Denoise preprocessing configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "strength"
@@ -210,6 +218,7 @@ properties:
                   name: "deblock"
                   description: |
                     Deblock preprocessing configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "strength"
@@ -220,10 +229,12 @@ properties:
                       name: "enabled"
                       description: |
                         Enable deblocker.
+                      default_from_api: true
                 - !ruby/object:Api::Type::NestedObject
                   name: "audio"
                   description: |
                     Audio preprocessing configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "lufs"
@@ -234,6 +245,7 @@ properties:
                   name: "crop"
                   description: |
                     Specify the video cropping configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "topPixels"
@@ -284,11 +296,13 @@ properties:
                   name: "deinterlace"
                   description: |
                     Specify the video pad filter configuration.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::NestedObject
                       name: "yadif"
                       description: |
                         Specifies the Yet Another Deinterlacing Filter Configuration.
+                      default_from_api: true
                       properties:
                         - !ruby/object:Api::Type::String
                           name: "mode"
@@ -308,10 +322,12 @@ properties:
                           name: "deinterlaceAllFrames"
                           description: |
                             Deinterlace all frames rather than just the frames identified as interlaced.
+                          default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "bwdif"
                       description: |
                         Bob Weaver Deinterlacing Filter Configuration.
+                      default_from_api: true
                       properties:
                         - !ruby/object:Api::Type::String
                           name: "mode"
@@ -327,57 +343,69 @@ properties:
                           name: "deinterlaceAllFrames"
                           description: |
                             Deinterlace all frames rather than just the frames identified as interlaced.
+                          default_from_api: true
       - !ruby/object:Api::Type::Array
         name: "editList"
         description: |
           List of input assets stored in Cloud Storage.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
               name: "key"
               description: |
                 A unique key for this atom.
+              default_from_api: true
             - !ruby/object:Api::Type::Array
               name: "inputs"
               item_type: Api::Type::String
               description: |
                 List of values identifying files that should be used in this atom.
+              default_from_api: true
             - !ruby/object:Api::Type::Time
               name: "startTimeOffset"
               description: |
                 Start time in seconds for the atom, relative to the input file timeline.
+              default_from_api: true
             - !ruby/object:Api::Type::Time
               name: "endTimeOffset"
               description: |
                 End time in seconds for the atom, relative to the input file timeline.
+              default_from_api: true
       - !ruby/object:Api::Type::Array
         name: "elementaryStreams"
         description: |
           List of input assets stored in Cloud Storage.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
               name: "key"
               description: |
                 A unique key for this atom.
+              default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "videoStream"
               description: |
                 Encoding of a video stream.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::NestedObject
                   name: "h264"
                   description: |
                     H264 codec settings
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "widthPixels"
                       description: |
                         The width of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "heightPixels"
                       description: |
                         The height of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "frameRate"
                       description: The target video frame rate in frames per second (FPS).
@@ -398,9 +426,11 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "pixelFormat"
                       description: Pixel format to use.
+                      default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "rateControlMode"
                       description: Specify the mode.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "crfLevel"
                       description: Target CRF level.
@@ -408,9 +438,11 @@ properties:
                     - !ruby/object:Api::Type::Boolean
                       name: "allowOpenGop"
                       description: Specifies whether an open Group of Pictures (GOP) structure should be allowed or not.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "enableTwoPass"
                       description: Use two-pass encoding strategy to achieve better video quality.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "vbvSizeBits"
                       description: Size of the Video Buffering Verifier (VBV) buffer in bits.
@@ -426,6 +458,7 @@ properties:
                     - !ruby/object:Api::Type::Boolean
                       name: "bPyramid"
                       description: Allow B-pyramid for reference frame selection.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "bFrameCount"
                       description: The number of consecutive B-frames.
@@ -441,6 +474,7 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "tune"
                       description: Enforces the specified codec tune.
+                      default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "preset"
                       description: Enforces the specified codec preset.
@@ -451,6 +485,7 @@ properties:
                     - !ruby/object:Api::Type::Time
                       name: "gopDuration"
                       description: Select the GOP size based on the specified duration.
+                      default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
                       description: SDR color format setting for H264.
@@ -467,15 +502,18 @@ properties:
                   name: "h265"
                   description: |
                     H265 codec settings
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "widthPixels"
                       description: |
                         The width of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "heightPixels"
                       description: |
                         The height of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "frameRate"
                       description: The target video frame rate in frames per second (FPS).
@@ -496,6 +534,7 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "pixelFormat"
                       description: Pixel format to use.
+                      default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "rateControlMode"
                       description: Specify the mode.
@@ -507,9 +546,11 @@ properties:
                     - !ruby/object:Api::Type::Boolean
                       name: "allowOpenGop"
                       description: Specifies whether an open Group of Pictures (GOP) structure should be allowed or not.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "enableTwoPass"
                       description: Use two-pass encoding strategy to achieve better video quality.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "vbvSizeBits"
                       description: Size of the Video Buffering Verifier (VBV) buffer in bits.
@@ -521,9 +562,11 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "entropyCoder"
                       description: The entropy coder to use.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "bPyramid"
                       description: Allow B-pyramid for reference frame selection.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "bFrameCount"
                       description: The number of consecutive B-frames.
@@ -539,6 +582,7 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "tune"
                       description: Enforces the specified codec tune.
+                      default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "preset"
                       description: Enforces the specified codec preset.
@@ -549,6 +593,7 @@ properties:
                     - !ruby/object:Api::Type::Time
                       name: "gopDuration"
                       description: Select the GOP size based on the specified duration.
+                      default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
                       description: SDR color format setting for H264.
@@ -571,15 +616,18 @@ properties:
                   name: "vp9"
                   description: |
                     VP9 codec settings
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::Integer
                       name: "widthPixels"
                       description: |
                         The width of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "heightPixels"
                       description: |
                         The height of the video in pixels.
+                      default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "frameRate"
                       description: The target video frame rate in frames per second (FPS).
@@ -622,6 +670,7 @@ properties:
                       description: |-
                         Specify the mode. The default is `vbr`. Supported rate control modes: -
                         `vbr` - variable bitrate
+                      default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
                       description: SDR color format setting for H264.
@@ -638,6 +687,7 @@ properties:
               name: "audioStream"
               description: |
                 Encoding of an audio stream.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "codec"
@@ -661,6 +711,7 @@ properties:
                   name: "mapping"
                   description: |
                     The mapping for the JobConfig.edit_list atoms with audio EditAtom.inputs.
+                  default_from_api: true
                   item_type: !ruby/object:Api::Type::NestedObject
                     properties:
                       - !ruby/object:Api::Type::String
@@ -677,37 +728,45 @@ properties:
                         name: "inputTrack"
                         description: |
                           The zero-based index of the track in the input file.
+                        default_from_api: true
                         required: true
                       - !ruby/object:Api::Type::Integer
                         name: "inputChannel"
                         description: |
                           The zero-based index of the channel in the input audio stream.
+                        default_from_api: true
                         required: true
                       - !ruby/object:Api::Type::Integer
                         name: "outputChannel"
                         description: |
                           The zero-based index of the channel in the output audio stream.
+                        default_from_api: true
                         required: true
                       - !ruby/object:Api::Type::Integer
                         name: "gainDb"
                         description: |
                           Audio volume control in dB. Negative values decrease volume, positive values increase.
+                        default_from_api: true
                 - !ruby/object:Api::Type::Integer
                   name: "sampleRateHertz"
                   description: |
                     The audio sample rate in Hertz.
+                  default_from_api: true
                 - !ruby/object:Api::Type::String
                   name: "languageCode"
                   description: |
                     The BCP-47 language code, such as en-US or sr-Latn. For more information, see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+                  default_from_api: true
                 - !ruby/object:Api::Type::String
                   name: "displayName"
                   description: |
                     The name for this particular audio stream that will be added to the HLS/DASH manifest.
+                  default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "textStream"
               description: |
                 Encoding of a text stream.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "codec"
@@ -716,10 +775,12 @@ properties:
                 - !ruby/object:Api::Type::String
                   name: "languageCode"
                   description: The BCP-47 language code, such as en-US or sr-Latn. For more information, see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+                  default_from_api: true
                 - !ruby/object:Api::Type::NestedObject
                   name: "mapping"
                   description: |
                     The mapping for the JobConfig.edit_list atoms with text EditAtom.inputs.
+                  default_from_api: true
                   properties:
                     - !ruby/object:Api::Type::String
                       name: "atomKey"
@@ -740,16 +801,19 @@ properties:
                   name: "displayName"
                   description: |
                     The name for this particular text stream that will be added to the HLS/DASH manifest.
+                  default_from_api: true
       - !ruby/object:Api::Type::Array
         name: "muxStreams"
         description: |
           Multiplexing settings for output stream.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
               name: "key"
               description: |
                 A unique key for this multiplexed stream.
+              default_from_api: true
             - !ruby/object:Api::Type::String
               name: "fileName"
               description: |
@@ -765,27 +829,33 @@ properties:
               item_type: Api::Type::String
               description: |
                 List of ElementaryStream.key values multiplexed in this stream.
+              default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "segmentSettings"
               description: |
                 Segment settings for ts, fmp4 and vtt.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::Time
                   name: "segmentDuration"
                   description: |
                     Duration of the segments in seconds
+                  default_from_api: true
                 - !ruby/object:Api::Type::Boolean
                   name: "individualSegments"
                   description: |
                     Whether to create an individual segment file or not.
+                  default_from_api: true
             - !ruby/object:Api::Type::String
               name: "encryptionId"
               description: |
                 Identifier of the encryption configuration to use.
+              default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "fmp4"
               description: |
                 fmp4 container configuration.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "codecTag"
@@ -796,6 +866,7 @@ properties:
         name: "manifests"
         description: |
           Manifest configuration.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
@@ -818,10 +889,12 @@ properties:
               item_type: Api::Type::String
               description: |
                 List of user supplied MuxStream.key values that should appear in this manifest.
+              default_from_api: true
             - !ruby/object:Api::Type::NestedObject
               name: "dash"
               description: |
                 DASH manifest configuration.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::Enum
                   name: "segmentReferenceScheme"
@@ -836,6 +909,7 @@ properties:
         name: "output"
         description: |
           Location of output file(s) in a Cloud Storage bucket.
+        default_from_api: true
         properties:
           - !ruby/object:Api::Type::String
             name: "uri"
@@ -846,6 +920,7 @@ properties:
         name: "adBreaks"
         description: |
           Ad break.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::Time
@@ -857,6 +932,7 @@ properties:
         name: "pubsubDestination"
         description: |
           Pub/Sub destination.
+        default_from_api: true
         properties:
           - !ruby/object:Api::Type::String
             name: "topic"
@@ -866,6 +942,7 @@ properties:
         name: "spriteSheets"
         description: |
           List of output sprite sheets. Spritesheets require at least one VideoStream in the Jobconfig.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
@@ -927,12 +1004,14 @@ properties:
         name: "overlays"
         description: |
           List of overlays on the output video, in descending Z-order.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::NestedObject
               name: "image"
               description: |
                 Image overlay.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "uri"
@@ -943,15 +1022,18 @@ properties:
                   name: "resolution"
                   description: |
                     2D normalized coordinates.
+                  default_from_api: true
                   properties:
-                    - !ruby/object:Api::Type::Integer
+                    - !ruby/object:Api::Type::Double
                       name: "x"
                       description: |
                         Normalized x coordinate.
-                    - !ruby/object:Api::Type::Integer
+                      default_from_api: true
+                    - !ruby/object:Api::Type::Double
                       name: "y"
                       description: |
                         Normalized y coordinate.
+                      default_from_api: true
                 - !ruby/object:Api::Type::Integer
                   name: "alpha"
                   description: |
@@ -961,12 +1043,14 @@ properties:
               name: "animations"
               description: |
                 List of animations. The list should be chronological, without any time overlap.
+              default_from_api: true
               item_type: !ruby/object:Api::Type::NestedObject
                 properties:
                   - !ruby/object:Api::Type::NestedObject
                     name: "animationStatic"
                     description: |
                       Display static overlay object.
+                    default_from_api: true
                     properties:
                       - !ruby/object:Api::Type::NestedObject
                         name: "xy"
@@ -993,6 +1077,7 @@ properties:
                     name: "animationFade"
                     description: |
                       Display overlay object with fade animation.
+                    default_from_api: true
                     properties:
                       - !ruby/object:Api::Type::NestedObject
                         name: "xy"
@@ -1040,6 +1125,7 @@ properties:
                     name: "animationEnd"
                     description: |
                       End previous animation.
+                    default_from_api: true
                     properties:
                       - !ruby/object:Api::Type::Time
                         name: "startTimeOffset"
@@ -1050,6 +1136,7 @@ properties:
         name: "encryptions"
         description: |
           List of encryption configurations for the content.
+        default_from_api: true
         item_type: !ruby/object:Api::Type::NestedObject
           properties:
             - !ruby/object:Api::Type::String
@@ -1061,6 +1148,7 @@ properties:
               name: "drmSystems"
               description: |
                 DRM system(s) to use; at least one must be specified. If a DRM system is omitted, it is considered disabled.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::NestedObject
                   name: "widevine"
@@ -1104,6 +1192,7 @@ properties:
               name: "mpegCenc"
               description: |
                 Configuration for MPEG Common Encryption (MPEG-CENC).
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "scheme"
@@ -1114,6 +1203,7 @@ properties:
               name: "secretManagerKeySource"
               description: |
                 Configuration for secrets stored in Google Secret Manager.
+              default_from_api: true
               properties:
                 - !ruby/object:Api::Type::String
                   name: "secretVersion"
