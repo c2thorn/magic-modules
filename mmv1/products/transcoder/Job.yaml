@@ -32,6 +32,9 @@ examples:
     vars:
       job_template_id: "example-job-template"
       bucket_name: "transcoder-job"
+    ignore_read_extra:
+      - 'state'
+      - 'end_time'
 parameters:
   - !ruby/object:Api::Type::String
     name: "location"
