@@ -55,6 +55,7 @@ examples:
     ignore_read_extra:
       - 'state'
       - 'end_time'
+    min_version: beta
   - !ruby/object:Provider::Terraform::Examples
     name: "transcoder_job_overlays"
     primary_resource_id: "default"
