@@ -28,6 +28,7 @@ resource "google_secret_manager_secret_version" "encryption_key" {
 data "google_project" "project" {
 }
 
+# this is required to allow the transcoder service identity to access the secret
 resource "google_project_service_identity" "transcoder" {
   project = data.google_project.project.project_id
   service = "transcoder.googleapis.com"
