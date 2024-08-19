@@ -14,12 +14,12 @@
 --- !ruby/object:Api::Resource
 name: 'NetworkFirewallPolicyAssociation'
 kind: 'compute#firewallPolicyAssociation'
-base_url: 'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}'
-id_format: 'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}/associations/{{name}}'
-self_link: 'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}/getAssociation?name={{name}}'
-create_url: 'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}/addAssociation'
+base_url: '{{firewall_policy}}'
+id_format: '{{firewall_policy}}/associations/{{name}}'
+self_link: '{{firewall_policy}}/getAssociation?name={{name}}'
+create_url: '{{firewall_policy}}/addAssociation'
 delete_verb: :POST
-delete_url: 'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}/removeAssociation?name={{name}}'
+delete_url: '{{firewall_policy}}/removeAssociation?name={{name}}'
 import_format: [
   'projects/{{project}}/global/firewallPolicies/{{firewall_policy}}/associations/{{name}}',
   '{{project}}/{{firewall_policy}}/{{name}}'
@@ -32,24 +32,10 @@ references: !ruby/object:Api::Resource::ReferenceLinks
 timeouts: !ruby/object:Api::Timeouts
   insert_minutes: 20
   delete_minutes: 20
-async: !ruby/object:Api::OpAsync
-  operation: !ruby/object:Api::OpAsync::Operation
-    kind: 'compute#operation'
-    path: 'name'
-    base_url: 'projects/{{project}}/global/operations/{{op_id}}'
-    wait_ms: 1000
-  result: !ruby/object:Api::OpAsync::Result
-    path: 'targetLink'
-  status: !ruby/object:Api::OpAsync::Status
-    path: 'status'
-    complete: 'DONE'
-    allowed:
-      - 'PENDING'
-      - 'RUNNING'
-      - 'DONE'
-  error: !ruby/object:Api::OpAsync::Error
-    path: 'error/errors'
-    message: 'message'
+custom_code: !ruby/object:Provider::Terraform::CustomCode
+  post_create: 'templates/terraform/constants/compute_network_firewall_policy_association_operation.go.erb'
+  post_delete: 'templates/terraform/constants/compute_network_firewall_policy_association_operation.go.erb'
+  test_check_destroy: 'templates/terraform/custom_check_destroy/skip_delete_during_test.go.erb'
 examples:
   - !ruby/object:Provider::Terraform::Examples
     name: 'network_firewall_policy_association'
@@ -73,6 +59,13 @@ parameters:
     diff_suppress_func: 'tpgresource.CompareSelfLinkOrResourceName'
     custom_flatten: 'templates/terraform/custom_flatten/name_from_self_link.erb'
     custom_expand: 'templates/terraform/custom_expand/resourceref_with_validation.go.erb'
+  - !ruby/object:Api::Type::String
+    name: 'project'
+    description: |
+      The project for the resource
+    immutable: true
+    default_from_api: true
+    diff_suppress_func: 'tpgresource.CompareSelfLinkOrResourceName'
 properties:
   - !ruby/object:Api::Type::String
     name: 'name'
