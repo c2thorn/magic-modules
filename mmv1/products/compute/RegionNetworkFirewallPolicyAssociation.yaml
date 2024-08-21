@@ -35,6 +35,7 @@ timeouts: !ruby/object:Api::Timeouts
 custom_code: !ruby/object:Provider::Terraform::CustomCode
   post_create: 'templates/terraform/constants/compute_region_network_firewall_policy_association_operation.go.erb'
   post_delete: 'templates/terraform/constants/compute_region_network_firewall_policy_association_operation.go.erb'
+  custom_import: 'templates/terraform/custom_import/network_region_firewall_policy_association_import.go.erb'
   test_check_destroy: 'templates/terraform/custom_check_destroy/skip_delete_during_test.go.erb'
 examples:
   - !ruby/object:Provider::Terraform::Examples
@@ -45,21 +46,16 @@ examples:
       association_name: 'my-association'
       network_name: 'my-network'
     test_env_vars:
-      project: :PROJECT_NAME
       region: :REGION
 parameters:
-  - !ruby/object:Api::Type::ResourceRef
+  - !ruby/object:Api::Type::String
     name: 'firewallPolicy'
-    resource: 'FirewallPolicy'
-    imports: 'name'
     description: |
-      The firewall policy ID of the association.
+      The firewall policy of the resource.
     required: true
-    immutable: true
     url_param_only: true
+    immutable: true
     diff_suppress_func: 'tpgresource.CompareSelfLinkOrResourceName'
-    custom_flatten: 'templates/terraform/custom_flatten/name_from_self_link.erb'
-    custom_expand: 'templates/terraform/custom_expand/resourceref_with_validation.go.erb'
   - !ruby/object:Api::Type::String
     name: 'project'
     description: |
@@ -70,6 +66,7 @@ parameters:
   - !ruby/object:Api::Type::String
     name: 'region'
     description: 'The location of this resource.'
+    url_param_only: true
     immutable: true
     default_from_api: true
 properties:
