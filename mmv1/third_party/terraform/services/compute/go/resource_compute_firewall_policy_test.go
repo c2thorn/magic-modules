@@ -62,7 +62,7 @@ resource "google_compute_firewall_policy" "default" {
   short_name  = "%s"
   description = "Resource created for Terraform acceptance testing"
 }
-`, "organizations/"+org, policyName)
+`, "organizations/"+org, policyName, "organizations/"+org, policyName)
 }
 
 func testAccComputeFirewallPolicy_update(org, policyName string) string {
@@ -78,5 +78,5 @@ resource "google_compute_firewall_policy" "default" {
   short_name  = "%s"
   description = "An updated description"
 }
-`, "organizations/"+org, policyName)
+`, "organizations/"+org, policyName, "organizations/"+org, policyName)
 }
