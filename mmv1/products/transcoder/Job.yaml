@@ -127,7 +127,7 @@ properties:
     description: |
       Job time to live value in days, which will be effective after job completion.
       Job should be deleted automatically after the given TTL.
-      Enter a value between 1 and 90. The default is 30.
+      Enter a value between 1 and 90. The default is `30`.
     default_from_api: true
   - !ruby/object:Api::Type::KeyValueLabels
     name: "labels"
@@ -254,7 +254,7 @@ properties:
                     - !ruby/object:Api::Type::String
                       name: "tune"
                       description: |
-                        Set the denoiser mode.
+                        Set the denoiser mode. The default is `standard``.
                       default_from_api: true
                 - !ruby/object:Api::Type::NestedObject
                   name: "deblock"
@@ -349,7 +349,7 @@ properties:
                         - !ruby/object:Api::Type::String
                           name: "mode"
                           description: |
-                            Specifies the deinterlacing mode to adopt.
+                            Specifies the deinterlacing mode to adopt. The default is `send_frame`.
                           default_from_api: true
                         - !ruby/object:Api::Type::Boolean
                           name: "disableSpatialInterlacing"
@@ -358,7 +358,7 @@ properties:
                         - !ruby/object:Api::Type::String
                           name: "parity"
                           description: |
-                            The picture field parity assumed for the input interlaced video.
+                            The picture field parity assumed for the input interlaced video. The default is `auto`.
                           default_from_api: true
                         - !ruby/object:Api::Type::Boolean
                           name: "deinterlaceAllFrames"
@@ -374,12 +374,12 @@ properties:
                         - !ruby/object:Api::Type::String
                           name: "mode"
                           description: |
-                            Specifies the deinterlacing mode to adopt.
+                            Specifies the deinterlacing mode to adopt. The default is `send_frame`.
                           default_from_api: true
                         - !ruby/object:Api::Type::String
                           name: "parity"
                           description: |
-                            The picture field parity assumed for the input interlaced video.
+                            The picture field parity assumed for the input interlaced video. The default is `auto`.
                           default_from_api: true
                         - !ruby/object:Api::Type::Boolean
                           name: "deinterlaceAllFrames"
@@ -407,7 +407,7 @@ properties:
             - !ruby/object:Api::Type::Time
               name: "startTimeOffset"
               description: |
-                Start time in seconds for the atom, relative to the input file timeline.
+                Start time in seconds for the atom, relative to the input file timeline. The default is `0s`.
               default_from_api: true
             - !ruby/object:Api::Type::Time
               name: "endTimeOffset"
@@ -455,7 +455,7 @@ properties:
                     - !ruby/object:Api::Type::Enum
                       name: "frameRateConversionStrategy"
                       description: |
-                        Frame rate conversion strategy for desired frame rate.
+                        Frame rate conversion strategy for desired frame rate. The default is `DOWNSAMPLE`.
                       default_from_api: true
                       values:
                         - :FRAME_RATE_CONVERSION_STRATEGY_UNSPECIFIED
@@ -467,15 +467,15 @@ properties:
                       required: true
                     - !ruby/object:Api::Type::String
                       name: "pixelFormat"
-                      description: Pixel format to use.
+                      description: Pixel format to use. The default is `yuv420p`.
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "rateControlMode"
-                      description: Specify the mode.
+                      description: Specify the mode. The default is `vbr`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "crfLevel"
-                      description: Target CRF level.
+                      description: Target CRF level. The default is `21`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "allowOpenGop"
@@ -495,7 +495,7 @@ properties:
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "entropyCoder"
-                      description: The entropy coder to use.
+                      description: The entropy coder to use. The default is `cabac`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "bPyramid"
@@ -519,14 +519,14 @@ properties:
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "preset"
-                      description: Enforces the specified codec preset.
+                      description: Enforces the specified codec preset. The default is `veryfast`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "gopFrameCount"
                       description: Select the GOP size based on the specified frame count.
                     - !ruby/object:Api::Type::Time
                       name: "gopDuration"
-                      description: Select the GOP size based on the specified duration.
+                      description: Select the GOP size based on the specified duration. The default is `3s`.
                       default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
@@ -563,7 +563,7 @@ properties:
                     - !ruby/object:Api::Type::Enum
                       name: "frameRateConversionStrategy"
                       description: |
-                        Frame rate conversion strategy for desired frame rate.
+                        Frame rate conversion strategy for desired frame rate. The default is `DOWNSAMPLE`.
                       default_from_api: true
                       values:
                         - :FRAME_RATE_CONVERSION_STRATEGY_UNSPECIFIED
@@ -575,15 +575,15 @@ properties:
                       required: true
                     - !ruby/object:Api::Type::String
                       name: "pixelFormat"
-                      description: Pixel format to use.
+                      description: Pixel format to use. The default is `yuv420p`.
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "rateControlMode"
-                      description: Specify the mode.
+                      description: Specify the mode. The default is `vbr`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "crfLevel"
-                      description: Target CRF level.
+                      description: Target CRF level. The default is `21`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Boolean
                       name: "allowOpenGop"
@@ -627,14 +627,14 @@ properties:
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "preset"
-                      description: Enforces the specified codec preset.
+                      description: Enforces the specified codec preset. The default is `veryfast`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "gopFrameCount"
                       description: Select the GOP size based on the specified frame count.
                     - !ruby/object:Api::Type::Time
                       name: "gopDuration"
-                      description: Select the GOP size based on the specified duration.
+                      description: Select the GOP size based on the specified duration. The default is `3s`.
                       default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
@@ -677,7 +677,7 @@ properties:
                     - !ruby/object:Api::Type::Enum
                       name: "frameRateConversionStrategy"
                       description: |
-                        Frame rate conversion strategy for desired frame rate.
+                        Frame rate conversion strategy for desired frame rate. The default is `DOWNSAMPLE`.
                       default_from_api: true
                       values:
                         - :FRAME_RATE_CONVERSION_STRATEGY_UNSPECIFIED
@@ -689,29 +689,21 @@ properties:
                       required: true
                     - !ruby/object:Api::Type::String
                       name: "pixelFormat"
-                      description: Pixel format to use.
+                      description: Pixel format to use. The default is `yuv420p`.
                       default_from_api: true
                     - !ruby/object:Api::Type::String
                       name: "profile"
-                      description: Enforces the specified codec profile.
+                      description: Enforces the specified codec profile. The default is `profile0`.
                       default_from_api: true
                     - !ruby/object:Api::Type::Integer
                       name: "gopFrameCount"
                       description: Select the GOP size based on the specified frame count.
                     - !ruby/object:Api::Type::Time
                       name: "gopDuration"
-                      description: Select the GOP size based on the specified duration.
-                    - !ruby/object:Api::Type::Integer
-                      name: crfLevel
-                      description: |-
-                        Target CRF level. Must be between 10 and 36, where 10 is the highest
-                        quality and 36 is the most efficient compression. The default is 21.
-                        **Note:** This field is not supported.
+                      description: Select the GOP size based on the specified duration. The default is `3s`.
                     - !ruby/object:Api::Type::String
                       name: rateControlMode
-                      description: |-
-                        Specify the mode. The default is `vbr`. Supported rate control modes: -
-                        `vbr` - variable bitrate
+                      description: Specify the mode. The default is `vbr`.
                       default_from_api: true
                     - !ruby/object:Api::Type::NestedObject
                       name: "sdr"
@@ -733,7 +725,7 @@ properties:
               properties:
                 - !ruby/object:Api::Type::String
                   name: "codec"
-                  description: The codec for this audio stream.
+                  description: The codec for this audio stream. The default is `aac`.
                   default_from_api: true
                 - !ruby/object:Api::Type::Integer
                   name: "bitrateBps"
@@ -741,13 +733,13 @@ properties:
                   required: true
                 - !ruby/object:Api::Type::Integer
                   name: "channelCount"
-                  description: Number of audio channels.
+                  description: Number of audio channels. The default is `2`.
                   default_from_api: true
                 - !ruby/object:Api::Type::Array
                   name: "channelLayout"
                   item_type: Api::Type::String
                   description: |
-                    A list of channel names specifying layout of the audio channels.
+                    A list of channel names specifying layout of the audio channels. The default is ["fl", "fr"].
                   default_from_api: true
                 - !ruby/object:Api::Type::Array
                   name: "mapping"
@@ -792,7 +784,7 @@ properties:
                 - !ruby/object:Api::Type::Integer
                   name: "sampleRateHertz"
                   description: |
-                    The audio sample rate in Hertz.
+                    The audio sample rate in Hertz. The default is `48000`.
                   default_from_api: true
                 - !ruby/object:Api::Type::String
                   name: "languageCode"
@@ -812,7 +804,7 @@ properties:
               properties:
                 - !ruby/object:Api::Type::String
                   name: "codec"
-                  description: The codec for this text stream.
+                  description: The codec for this text stream. The default is `webvtt`.
                   default_from_api: true
                 - !ruby/object:Api::Type::String
                   name: "languageCode"
@@ -864,7 +856,7 @@ properties:
             - !ruby/object:Api::Type::String
               name: "container"
               description: |
-                The container format.
+                The container format. The default is `mp4`.
               default_from_api: true
             - !ruby/object:Api::Type::Array
               name: "elementaryStreams"
@@ -881,7 +873,7 @@ properties:
                 - !ruby/object:Api::Type::Time
                   name: "segmentDuration"
                   description: |
-                    Duration of the segments in seconds
+                    Duration of the segments in seconds. The default is `6.0s`.
                   default_from_api: true
                 - !ruby/object:Api::Type::Boolean
                   name: "individualSegments"
@@ -914,7 +906,7 @@ properties:
             - !ruby/object:Api::Type::String
               name: "fileName"
               description: |
-                The name of the generated file.
+                The name of the generated file. The default is `manifest`.
               default_from_api: true
             - !ruby/object:Api::Type::Enum
               name: "type"
@@ -941,7 +933,7 @@ properties:
                 - !ruby/object:Api::Type::Enum
                   name: "segmentReferenceScheme"
                   description: |
-                    The segment reference scheme for a DASH manifest.
+                    The segment reference scheme for a DASH manifest. The default is `SEGMENT_LIST`.
                   default_from_api: true
                   values:
                     - :SEGMENT_REFERENCE_SCHEME_UNSPECIFIED
@@ -990,7 +982,7 @@ properties:
             - !ruby/object:Api::Type::String
               name: "format"
               description: |
-                Format type.
+                Format type. The default is `jpeg`.
               default_from_api: true
             - !ruby/object:Api::Type::String
               name: "filePrefix"
@@ -1030,12 +1022,12 @@ properties:
             - !ruby/object:Api::Type::Integer
               name: "quality"
               description: |
-                The quality of the generated sprite sheet.
+                The quality of the generated sprite sheet. The default is `100`.
               default_from_api: true
             - !ruby/object:Api::Type::Integer
               name: "totalCount"
               description: |
-                Total number of sprites.
+                Total number of sprites. The default is `100`.
               default_from_api: true
             - !ruby/object:Api::Type::Time
               name: "interval"
