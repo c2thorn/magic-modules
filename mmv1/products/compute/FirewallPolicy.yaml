@@ -14,6 +14,7 @@
 --- !ruby/object:Api::Resource
 name: 'FirewallPolicy'
 kind: 'compute#firewallPolicy'
+min_version: 'beta'
 base_url: 'locations/global/firewallPolicies'
 id_format: 'locations/global/firewallPolicies/{{name}}'
 self_link: 'locations/global/firewallPolicies/{{name}}?parentId={{parent}}'
