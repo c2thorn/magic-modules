@@ -587,3 +587,12 @@ properties:
         name: graceEndTime
         description: |
           Grace end time of the trial cluster.
+  - !ruby/object:Api::Type::KeyValuePairs
+    name: 'tags'
+    description: |
+      A map of resource manager tags_.
+      Resource manager tag keys and values have the same definition as resource manager tags.
+      Keys must be in the format tagKeys/{tag_key_id}, and values are in the format tagValues/456.
+      The field is ignored (both PUT & PATCH) when empty.
+    ignore_read: true
+    immutable: true
