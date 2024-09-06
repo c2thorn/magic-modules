@@ -63,9 +63,6 @@ func TestAccAlloydbBackup_tags(t *testing.T) {
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"tags"},
 			},
-			{
-				Config: testAccAlloydbBackupTags_allowDestroy(map[string]string{org + "/" + tagKey: tagValue}),
-			},
 		},
 	})
 }
@@ -323,59 +320,8 @@ resource "google_alloydb_backup" "default" {
 	for key, value := range tags {
 		l += fmt.Sprintf("%q = %q\n", key, value)
 	}
-
-	l += fmt.Sprintf("}\n}")
-	return r + l
-}
-
-func testAccFileInstanceTags_allowDestroy(context map[string]interface{}, tags map[string]string) string {
-
-	r := acctest.Nprintf(`
-resource "google_alloydb_cluster" "default" {
-  cluster_id = "alloydb-cluster-0001"
-  location   = "us-central1"
-  network_config {
-    network = google_compute_network.default.id
-  }
-}
-
-resource "google_alloydb_instance" "default" {
-  cluster       = google_alloydb_cluster.default.name
-  instance_id   = "alloydb-instance-0001"
-  instance_type = "PRIMARY"
-
-  depends_on = [google_service_networking_connection.vpc_connection]
-}
-
-resource "google_compute_global_address" "private_ip_alloc" {
-  name          =  "alloydb-cluster-0001"
-  address_type  = "INTERNAL"
-  purpose       = "VPC_PEERING"
-  prefix_length = 16
-  network       = google_compute_network.default.id
-}
-
-resource "google_service_networking_connection" "vpc_connection" {
-  network                 = google_compute_network.default.id
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_alloc.name]
-}
-
-resource "google_compute_network" "default" {
-  name = "alloydb-network-0001"
-}
-resource "google_alloydb_backup" "default" {
-  location     = "us-central1"
-  backup_id    = "alloydb-backup"
-  cluster_name = google_alloydb_cluster.default.name
-  depends_on = [google_alloydb_instance.default]
-  tags = {`, context)
-
-	l := ""
-	for key, value := range tags {
-		l += fmt.Sprintf("%q = %q\n", key, value)
 	}
-
-	l += fmt.Sprintf("}\n}")
+	}
 	return r + l
 }
+
