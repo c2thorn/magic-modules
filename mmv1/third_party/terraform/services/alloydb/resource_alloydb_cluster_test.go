@@ -1571,18 +1571,13 @@ func TestAccAlloydbCluster_standardClusterUpdateFailure(t *testing.T) {
 }
 
 func TestAccAlloydbCluster_tags(t *testing.T) {
-	t.Skip()
-
 	t.Parallel()
-
-	instance := fmt.Sprintf("tf-test%s.org1.com", acctest.RandString(t, 5))
+        
+        tagKey := acctest.BootstrapSharedTestTagKey(t, "metastore-federations-tagkey")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "metastore-federations-tagvalue", tagKey)
 	context := map[string]interface{}{
-		"instance": instance,
-		"resource_name": "instance",
+		"random_suffix": acctest.RandString(t, 10),
 	}
-
-	resourceName := acctest.Nprintf("google_alloydb_cluster.%{resource_name}", context)
-	org := envvar.GetTestOrgFromEnv(t)
 
 	acctest.VcrTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -1590,16 +1585,13 @@ func TestAccAlloydbCluster_tags(t *testing.T) {
 		CheckDestroy:             testAccCheckAlloydbClusterDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAlloydbClusterTags(context, map[string]string{org + "/env": "test"}),
+				Config: testAccAlloydbClusterTags(context, map[string]string{org + "/" + tagKey: tagValue}),
 			},
 			{
-				ResourceName:            resourceName,
+				ResourceName:            "google_alloydb_cluster.default",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"cluster_id", "location", "name"},
-			},
-			{
-				Config: testAccAlloydbClusterTags_allowDestroy(context, map[string]string{org + "/env": "test"}),
+				ImportStateVerifyIgnore: []string{"tags"},
 			},
 		},
 	})
@@ -1623,31 +1615,8 @@ func testAccAlloydbClusterTags(context map[string]interface{}, tags map[string]s
 	for key, value := range tags {
 		l += fmt.Sprintf("%q = %q\n", key, value)
 	}
-
-	l += fmt.Sprintf("}\n}")
-	return r + l
-}
-
-func testAccAlloydbClusterTags_allowDestroy(context map[string]interface{}, tags map[string]string) string {
-
-	r := acctest.Nprintf(`
-	resource "google_compute_network" "%{resource_name}" {
-          name = "alloydb-network"
         }
-	resource "google_alloydb_cluster" "%{resource_name}" {
-          cluster_id = "alloydb-cluster"
-          location   = "us-central1"
-            network_config {
-              network = google_compute_network.default.id
-            }
-	  tags = {`, context)
-
-	l := ""
-	for key, value := range tags {
-		l += fmt.Sprintf("%q = %q\n", key, value)
-	}
-
-	l += fmt.Sprintf("}\n}")
+        }
 	return r + l
 }
 
