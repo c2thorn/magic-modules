@@ -1573,8 +1573,8 @@ func TestAccAlloydbCluster_standardClusterUpdateFailure(t *testing.T) {
 func TestAccAlloydbCluster_tags(t *testing.T) {
 	t.Parallel()
         
-        tagKey := acctest.BootstrapSharedTestTagKey(t, "metastore-federations-tagkey")
-	tagValue := acctest.BootstrapSharedTestTagValue(t, "metastore-federations-tagvalue", tagKey)
+        tagKey := acctest.BootstrapSharedTestTagKey(t, "alloydb-clusters-tagkey")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "alloydb-clusters-tagvalue", tagKey)
 	context := map[string]interface{}{
 		"random_suffix": acctest.RandString(t, 10),
 	}
