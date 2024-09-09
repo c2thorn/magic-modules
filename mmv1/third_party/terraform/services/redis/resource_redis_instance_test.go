@@ -320,35 +320,25 @@ func TestAccRedisInstance_downgradeRedisVersion(t *testing.T) {
 }
 
 func TestAccRedisInstance_tags(t *testing.T) {
-	t.Skip()
 
 	t.Parallel()
 
-	instance := fmt.Sprintf("tf-test%s.org1.com", acctest.RandString(t, 5))
-	context := map[string]interface{}{
-		"instance": instance,
-		"resource_name": "instance",
-	}
-
-	resourceName := acctest.Nprintf("google_redis_instance.%{resource_name}", context)
-	org := envvar.GetTestOrgFromEnv(t)
-
+	name := fmt.Sprintf("tf-test-%d", acctest.RandInt(t))
+	tagKey := acctest.BootstrapSharedTestTagKey(t, "redis-instances-tagkey")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "redis-instances-tagvalue", tagKey)
 	acctest.VcrTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
 		CheckDestroy:             testAccCheckRedisInstanceDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccRedisInstanceTags(context, map[string]string{org + "/env": "test"}),
+				Config: testAccRedisInstanceTags(name, map[string]string{tagKey: tagValue}),
 			},
 			{
-				ResourceName:            resourceName,
+				ResourceName:            "google_redis_instance.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"labels", "location", "name", "terraform_labels", "zone"},
-			},
-			{
-				Config: testAccRedisInstanceTags_allowDestroy(context, map[string]string{org + "/env": "test"}),
+				ImportStateVerifyIgnore: []string{"tags"},
 			},
 		},
 	})
@@ -498,33 +488,31 @@ resource "google_redis_instance" "test" {
 `, name)
 }
 
-func testAccRedisInstanceTags(context map[string]interface{}, tags map[string]string) string {
+func testAccRedisInstanceTags(name string, tags map[string]string) string {
 
-	r := acctest.Nprintf(`
+	r := fmt.Sprintf(`
 	resource "google_redis_instance" "%{resource_name}" {
 	  name = "tf-instance-%s"
-	  memory_size_gb = 1
-          labels = {
-            "key1" = "value1"
-            "key2" = "value2"
+	  authorized_network = google_service_networking_connection.private_service_connection.network
+          node_config {
+            cpu_count      = 1
+            memory_size_mb = 1024
           }
-	  tags = {`, context)
+         node_count = 1
+         memcache_version = "MEMCACHE_1_5"
 
-	l := ""
-	for key, value := range tags {
-		l += fmt.Sprintf("%q = %q\n", key, value)
-	}
-
-	l += fmt.Sprintf("}\n}")
-	return r + l
-}
-
-func testAccRedisInstanceTags_allowDestroy(context map[string]interface{}, tags map[string]string) string {
-
-	r := acctest.Nprintf(`
-	resource "google_redis_instance" "%{resource_name}" {
-	  name = "tf-instance-%s"
-	  memory_size_gb = 1
+         maintenance_policy {
+           weekly_maintenance_window {
+             day      = "SATURDAY"
+             duration = "14400s"
+             start_time {
+               hours = 0
+               minutes = 30
+               seconds = 0
+               nanos = 0
+             }
+          }
+        }
           labels = {
             "key1" = "value1"
             "key2" = "value2"
