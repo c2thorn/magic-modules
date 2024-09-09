@@ -38,6 +38,7 @@ module Provider
     attr_accessor :resource_count
     attr_accessor :iam_resource_count
     attr_accessor :resources_for_version
+    attr_accessor :go_yaml_files
 
     TERRAFORM_PROVIDER_GA = 'github.com/hashicorp/terraform-provider-google'.freeze
     TERRAFORM_PROVIDER_BETA = 'github.com/hashicorp/terraform-provider-google-beta'.freeze
@@ -71,6 +72,7 @@ module Provider
       @resource_count = 0
       @iam_resource_count = 0
       @resources_for_version = []
+      @go_yaml_files = []
     end
 
     # This provides the ProductFileTemplate class with access to a provider.
@@ -412,16 +414,41 @@ module Provider
     def generate_object_modified(object, output_folder, version_name)
       # skip healthcare - exceptional case will be done manually
       return if (output_folder.include? 'healthcare') || (output_folder.include? 'memorystore')
+      
+      generateProduct = false
+      if @go_yaml_files
+        found = false
+        @go_yaml_files.each do |f|
+          # Google::LOGGER.info "go_yaml_file #{f} "
+          no_ext = Pathname.new(f).sub_ext ''
+          parts = no_ext.each_filename.to_a
+          targetProduct = parts[-3]+ '/' + parts[-2]
+          targetResource = parts[-1]
+          # Google::LOGGER.info "product #{targetProduct} resource #{targetResource} output_folder #{output_folder} obj.Name #{object.name}"
+          if targetResource == "product"
+            # Google::LOGGER.info "generating a temp project.yaml"
+            generateProduct = true
+          end
+          if output_folder == targetProduct && object.name == targetResource 
+            found = true
+          end
+        end
+        return unless found
+      end 
 
       pwd = Dir.pwd
       data = build_object_data(pwd, object, output_folder, version_name)
       Dir.chdir output_folder
       Google::LOGGER.info "Generating #{object.name} rewrite yaml"
-      generate_newyaml(pwd, data.clone)
+      if @go_yaml_files
+        generate_newyaml_temp(pwd, data.clone, generateProduct)
+      else
+        generate_newyaml(pwd, data.clone)
+      end
       Dir.chdir pwd
     end
 
-    def generate_newyaml(pwd, data)
+    def generate_newyaml(pwd, data, targetPath)
       data.generate(pwd,
                     '/templates/terraform/yaml_conversion.erb',
                     "go_#{data.object.name}.yaml",
@@ -430,6 +457,19 @@ module Provider
         data.generate(pwd,
                       '/templates/terraform/product_yaml_conversion.erb',
                       'go_product.yaml',
+                      self)
+      end
+    end
+
+    def generate_newyaml_temp(pwd, data, generateProduct)
+      data.generate(pwd,
+                    '/templates/terraform/yaml_conversion.erb',
+                    "#{data.object.name}.yaml.temp",
+                    self)
+      if generateProduct
+        data.generate(pwd,
+                      '/templates/terraform/product_yaml_conversion.erb',
+                      'product.yaml.temp',
                       self)
       end
     end
