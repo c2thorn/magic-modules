@@ -134,7 +134,7 @@ func getResourcePropertiesFromSelfLinkOrSchema(d *schema.ResourceData, config *t
 		n, ok := d.GetOk("name")
 		name := n.(string)
 		if !ok {
-			return "", "", "", errors.New("must provide either `self_link` or `name`")
+			return "", "", "", errors.New("TEST 4must provide either `self_link` or `name`")
 		}
 		return project, location, name, nil
 	}

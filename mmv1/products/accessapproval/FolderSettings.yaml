@@ -57,7 +57,7 @@ properties:
   - !ruby/object:Api::Type::String
     name: name
     description: |
-      The resource name of the settings. Format is "folders/{folder_id}/accessApprovalSettings"
+      TEST 1 The resource name of the settings. Format is "folders/{folder_id}/accessApprovalSettings"
     output: true
   - !ruby/object:Api::Type::Array
     name: notificationEmails
