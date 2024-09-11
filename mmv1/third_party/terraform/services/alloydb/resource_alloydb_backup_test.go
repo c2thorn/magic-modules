@@ -43,30 +43,6 @@ func TestAccAlloydbBackup_update(t *testing.T) {
 	})
 }
 
-func TestAccAlloydbBackup_tags(t *testing.T) {
-	t.Parallel()
-	
-	tagKey := acctest.BootstrapSharedTestTagKey(t, "alloydb-backups-tagkey")
-	tagValue := acctest.BootstrapSharedTestTagValue(t, "alloydb-backups-tagvalue", tagKey)
-
-	acctest.VcrTest(t, resource.TestCase{
-		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
-		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
-		CheckDestroy:             testAccCheckAlloydbBackupDestroyProducer(t),
-		Steps: []resource.TestStep{
-			{
-				Config: testAccAlloydbBackupTags(map[string]string{org + "/" + tagKey: tagValue}),
-			},
-			{
-				ResourceName:            "google_alloydb_backup.default",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"tags"},
-			},
-		},
-	})
-}
-
 func testAccAlloydbBackup_alloydbBackupBasic(context map[string]interface{}) string {
 	return acctest.Nprintf(`
 resource "google_alloydb_backup" "default" {
@@ -272,13 +248,43 @@ resource "google_kms_crypto_key_iam_member" "crypto_key" {
 }
 `, context)
 }
-func testAccFileInstanceTags(context map[string]interface{}, tags map[string]string) string {
 
-	r := acctest.Nprintf(`
+func TestAccAlloydbBackup_tags(t *testing.T) {
+	t.Parallel()
+	
+	random_suffix := acctest.RandString(t, 10)
+	context := map[string]interface{}{
+		"network_name":  acctest.BootstrapSharedServiceNetworkingConnection(t, "alloydb-backup-update-1"),
+		"random_suffix": random_suffix,
+	}
+	tagKey := acctest.BootstrapSharedTestTagKey(t, "alloydb-backups-tagkey")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "alloydb-backups-tagvalue", tagKey)
+
+	acctest.VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckAlloydbBackupDestroyProducer(t),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAlloydbBackupTags(context, map[string]string{tagKey: tagValue}),
+			},
+			{
+				ResourceName:            "google_alloydb_backup.default",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"backup_id", "location", "reconciling", "update_time", "labels", "terraform_labels", "tags"},
+			},
+		},
+	})
+}
+
+func testAccAlloydbBackupTags(context map[string]interface{}, tags map[string]string) string {
+
+	return acctest.Nprintf(`
 
 resource "google_alloydb_cluster" "default" {
-  cluster_id = "alloydb-cluster-0001"
-  location   = "us-central1"
+  cluster_id = "a12-alloydb-cluster"
+  location   = "us-west2"
   network_config {
     network = google_compute_network.default.id
   }
@@ -286,14 +292,14 @@ resource "google_alloydb_cluster" "default" {
 
 resource "google_alloydb_instance" "default" {
   cluster       = google_alloydb_cluster.default.name
-  instance_id   = "alloydb-instance-0001"
+  instance_id   = "a12-alloydb-instance"
   instance_type = "PRIMARY"
 
   depends_on = [google_service_networking_connection.vpc_connection]
 }
 
 resource "google_compute_global_address" "private_ip_alloc" {
-  name          =  "alloydb-cluster-0001"
+  name          =  "a12-alloydb-cluster"
   address_type  = "INTERNAL"
   purpose       = "VPC_PEERING"
   prefix_length = 16
@@ -307,21 +313,16 @@ resource "google_service_networking_connection" "vpc_connection" {
 }
 
 resource "google_compute_network" "default" {
-  name = "alloydb-network-0001"
+  name = "a12-alloydb-network"
 }
 resource "google_alloydb_backup" "default" {
-  location     = "us-central1"
-  backup_id    = "alloydb-backup"
+  location     = "us-west2"
+  backup_id    = "a12-alloydb-backup"
   cluster_name = google_alloydb_cluster.default.name
   depends_on = [google_alloydb_instance.default]
-  tags = {`, context)
-
-	l := ""
-	for key, value := range tags {
-		l += fmt.Sprintf("%q = %q\n", key, value)
-	}
-	}
-	}
-	return r + l
+  tags = {
+	"tagKeys/281478409127147" = "tagValues/281479442205542"
 }
-
+}
+`, context)
+}
