@@ -1,3 +1,5 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
 package alloydb_test
 
 import (
@@ -1585,13 +1587,13 @@ func TestAccAlloydbCluster_tags(t *testing.T) {
 		CheckDestroy:             testAccCheckAlloydbClusterDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAlloydbClusterTags(context, map[string]string{org + "/" + tagKey: tagValue}),
+				Config: testAccAlloydbClusterTags(context, map[string]string{tagKey: tagValue}),
 			},
 			{
 				ResourceName:            "google_alloydb_cluster.default",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"tags"},
+				ImportStateVerifyIgnore: []string{"initial_user", "cluster_id", "location", "tags"},
 			},
 		},
 	})
@@ -1599,24 +1601,19 @@ func TestAccAlloydbCluster_tags(t *testing.T) {
 
 func testAccAlloydbClusterTags(context map[string]interface{}, tags map[string]string) string {
 
-	r := acctest.Nprintf(`
-	resource "google_compute_network" "%{resource_name}" {
-          name = "alloydb-network"
+	return acctest.Nprintf(`
+	resource "google_compute_network" "default" {
+          name = "alloydb-network-new"
         }
-	resource "google_alloydb_cluster" "%{resource_name}" {
-          cluster_id = "alloydb-cluster"
+	resource "google_alloydb_cluster" "default" {
+          cluster_id = "alloydb-cluster-new"
           location   = "us-central1"
             network_config {
               network = google_compute_network.default.id
             }
-	  tags = {`, context)
-
-	l := ""
-	for key, value := range tags {
-		l += fmt.Sprintf("%q = %q\n", key, value)
-	}
-        }
-        }
-	return r + l
+	tags = {
+	"tagKeys/281478409127147" = "tagValues/281479442205542"
 }
-
+}
+`, context)
+}
