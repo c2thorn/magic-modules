@@ -207,3 +207,45 @@ resource "google_data_fusion_instance" "basic_instance" {
 }
 `, context)
 }
+
+func TestAccDatafusionInstance_tags(t *testing.T) {
+	t.Parallel()
+	instanceName := fmt.Sprintf("tf-test-%s", acctest.RandString(t, 10))
+	tagKey := acctest.BootstrapSharedTestTagKey(t, "datafusion-instances-tagkey")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "datafusion-instances-tagvalue", tagKey)
+
+	acctest.VcrTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
+		CheckDestroy:             testAccCheckDataFusionInstanceDestroyProducer(t)
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMetastoreServiceTags(InstanceName, map[string]string{tagKey: tagValue}),
+			},
+			{
+				ResourceName:            "google_data_fusion_instance.instance",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"region", "labels", "terraform_labels", "tags"},
+			},
+		},
+	})
+}
+
+func testAccDatafusionInstanceTags(nstanceName string,tags map[string]string) string {
+
+	r := acctest.Nprintf(`
+	resource "google_data_fusion_instance" "instance" {
+        name   = "my-instance"
+        region = "us-central1"
+        type   = "BASIC"
+	  tags = {`, context)
+
+	l := ""
+	for key, value := range tags {
+		l += fmt.Sprintf("%q = %q\n", key, value)
+	}
+
+	l += fmt.Sprintf("}\n}")
+	return r + l
+}
