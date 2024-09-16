@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-provider-google/google/acctest"
+	"github.com/hashicorp/terraform-provider-google/google/envvar"
 )
 
 func TestAccDataFusionInstance_update(t *testing.T) {
@@ -210,17 +211,21 @@ resource "google_data_fusion_instance" "basic_instance" {
 
 func TestAccDatafusionInstance_tags(t *testing.T) {
 	t.Parallel()
-	instanceName := fmt.Sprintf("tf-test-%s", acctest.RandString(t, 10))
+	org := envvar.GetTestOrgFromEnv(t)
+	context := map[string]interface{}{
+		"random_suffix": acctest.RandString(t, 10),
+		"version":       "6.9.1",
+	}
 	tagKey := acctest.BootstrapSharedTestTagKey(t, "datafusion-instances-tagkey")
 	tagValue := acctest.BootstrapSharedTestTagValue(t, "datafusion-instances-tagvalue", tagKey)
 
 	acctest.VcrTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.AccTestPreCheck(t) },
 		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
-		CheckDestroy:             testAccCheckDataFusionInstanceDestroyProducer(t)
+		CheckDestroy:             testAccCheckDataFusionInstanceDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMetastoreServiceTags(InstanceName, map[string]string{tagKey: tagValue}),
+				Config: testAccDatafusionInstanceTags(context, map[string]string{org + "/" + tagKey: tagValue}),
 			},
 			{
 				ResourceName:            "google_data_fusion_instance.instance",
@@ -232,7 +237,7 @@ func TestAccDatafusionInstance_tags(t *testing.T) {
 	})
 }
 
-func testAccDatafusionInstanceTags(nstanceName string,tags map[string]string) string {
+func testAccDatafusionInstanceTags(context map[string]interface{},tags map[string]string) string {
 
 	r := acctest.Nprintf(`
 	resource "google_data_fusion_instance" "instance" {
