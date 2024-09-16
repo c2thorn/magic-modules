@@ -2,16 +2,18 @@ package dataprocmetastore_test
 
 import (
 	"fmt"
-	"testing"
 	"github.com/hashicorp/terraform-provider-google/google/acctest"
+	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-provider-google/google/envvar"
 )
 
 func TestAccMetastoreFederation_tags(t *testing.T) {
 	t.Parallel()
-	
-        context := map[string]interface{}{
+
+        org := envvar.GetTestOrgFromEnv(t)
+	context := map[string]interface{}{
 		"random_suffix": acctest.RandString(t, 10),
 	}
 	tagKey := acctest.BootstrapSharedTestTagKey(t, "metastore-federations-tagkey")
@@ -22,10 +24,10 @@ func TestAccMetastoreFederation_tags(t *testing.T) {
 		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMetastoreFederationTags(context, map[string]string{tagKey: tagValue}),
+				Config: testAccMetastoreFederationTags(context, map[string]string{org + "/" + tagKey: tagValue}),
 			},
 			{
-				ResourceName:            "google_metastore_federation.my_metastore",
+				ResourceName:            "google_dataproc_metastore_federation.default",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"tags"},
@@ -34,23 +36,12 @@ func TestAccMetastoreFederation_tags(t *testing.T) {
 	})
 }
 
-func testAccMetastoreFederationTags(context map[string]interface{},tags map[string]string) string {
+func testAccMetastoreFederationTags(context map[string]interface{}, tags map[string]string) string {
 
 	r := acctest.Nprintf(`
-	resource "google_dataproc_metastore_federation" "default" {
-          location      = "us-central1"
-          federation_id = "metastore-fed"
-          version       = "3.1.2"
-
-          backend_metastores {
-            rank           = "1"
-            name           = google_dataproc_metastore_service.default.id
-            metastore_type = "DATAPROC_METASTORE" 
-         }
-       }
 
        resource "google_dataproc_metastore_service" "default" {
-         service_id = "metastore-srv-new"
+         service_id = "metastore-srv-sep16"
          location   = "us-central1"
          tier       = "DEVELOPER"
 
@@ -58,6 +49,17 @@ func testAccMetastoreFederationTags(context map[string]interface{},tags map[stri
          hive_metastore_config {
            version           = "3.1.2"
            endpoint_protocol = "GRPC"
+         }
+         }
+       resource "google_dataproc_metastore_federation" "default" {
+          location      = "us-central1"
+          federation_id = "metastore-fed-sep16"
+          version       = "3.1.2"
+
+          backend_metastores {
+            rank           = "1"
+            name           = google_dataproc_metastore_service.default.id
+            metastore_type = "DATAPROC_METASTORE" 
          }
 	  tags = {`, context)
 
