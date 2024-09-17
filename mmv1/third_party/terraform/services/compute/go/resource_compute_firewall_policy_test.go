@@ -58,6 +58,8 @@ resource "google_folder" "folder" {
 }
 
 resource "google_compute_firewall_policy" "default" {
+  provider = google-beta
+  
   parent      = "%s"
   short_name  = "%s"
   description = "Resource created for Terraform acceptance testing"
@@ -74,6 +76,8 @@ resource "google_folder" "folder" {
 }
 
 resource "google_compute_firewall_policy" "default" {
+  provider = google-beta
+  
   parent      = "%s"
   short_name  = "%s"
   description = "An updated description"
