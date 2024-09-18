@@ -3,9 +3,11 @@ package alloydb_test
 import (
 	"regexp"
 	"testing"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-provider-google/google/acctest"
+	"github.com/hashicorp/terraform-provider-google/google/envvar"
 )
 
 func TestAccAlloydbCluster_update(t *testing.T) {
@@ -1573,8 +1575,9 @@ func TestAccAlloydbCluster_standardClusterUpdateFailure(t *testing.T) {
 func TestAccAlloydbCluster_tags(t *testing.T) {
 	t.Parallel()
         
-        tagKey := acctest.BootstrapSharedTestTagKey(t, "alloydb-clusters-tagkey")
-	tagValue := acctest.BootstrapSharedTestTagValue(t, "alloydb-clusters-tagvalue", tagKey)
+        org := envvar.GetTestOrgFromEnv(t)
+        tagKey := acctest.BootstrapSharedTestTagKey(t, "alloydb-clusters-tagkey-new")
+	tagValue := acctest.BootstrapSharedTestTagValue(t, "alloydb-clusters-tagvalue-new", tagKey)
 	context := map[string]interface{}{
 		"random_suffix": acctest.RandString(t, 10),
 	}
@@ -1585,7 +1588,7 @@ func TestAccAlloydbCluster_tags(t *testing.T) {
 		CheckDestroy:             testAccCheckAlloydbClusterDestroyProducer(t),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAlloydbClusterTags(context, map[string]string{tagKey: tagValue}),
+				Config: testAccAlloydbClusterTags(context, map[string]string{org + "/" + tagKey: tagValue}),
 			},
 			{
 				ResourceName:            "google_alloydb_cluster.default",
@@ -1599,19 +1602,22 @@ func TestAccAlloydbCluster_tags(t *testing.T) {
 
 func testAccAlloydbClusterTags(context map[string]interface{}, tags map[string]string) string {
 
-	return acctest.Nprintf(`
-	resource "google_compute_network" "default" {
-          name = "alloydb-network-new"
-        }
-	resource "google_alloydb_cluster" "default" {
-          cluster_id = "alloydb-cluster-new"
-          location   = "us-central1"
-            network_config {
-              network = google_compute_network.default.id
-            }
-	tags = {
-	"tagKeys/281478409127147" = "tagValues/281479442205542"
-}
-}
-`, context)
+	r := acctest.Nprintf(`
+
+data "google_project" "project" {}
+
+
+resource "google_alloydb_cluster" "default" {
+  cluster_id = "tf-test-alloydb-cluster%{random_suffix}"
+  location   = "us-central1"
+            
+	tags = {`, context)
+
+	l := ""
+	for key, value := range tags {
+		l += fmt.Sprintf("%q = %q\n", key, value)
+	}
+
+	l += fmt.Sprintf("}\n}")
+	return r + l
 }
