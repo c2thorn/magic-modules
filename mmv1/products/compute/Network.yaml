@@ -62,6 +62,27 @@ examples:
       network_name: 'vpc-network'
     test_env_vars:
       project: :PROJECT_NAME
+  - !ruby/object:Provider::Terraform::Examples
+    name: 'network_bgp_best_path_selection_mode'
+    primary_resource_id: 'vpc_network'
+    vars:
+      network_name: 'vpc-network'
+    test_env_vars:
+      project: :PROJECT_NAME
+  - !ruby/object:Provider::Terraform::Examples
+    name: 'network_bgp_always_compare_med'
+    primary_resource_id: 'vpc_network'
+    vars:
+      network_name: 'vpc-network'
+    test_env_vars:
+      project: :PROJECT_NAME
+  - !ruby/object:Provider::Terraform::Examples
+    name: 'network_bgp_inter_region_cost'
+    primary_resource_id: 'vpc_network'
+    vars:
+      network_name: 'vpc-network'
+    test_env_vars:
+      project: :PROJECT_NAME
 virtual_fields:
   - !ruby/object:Api::Type::Boolean
     name: 'delete_default_routes_on_create'
@@ -146,6 +167,39 @@ properties:
         update_verb: :PATCH
         update_url: projects/{{project}}/global/networks/{{name}}
         default_from_api: true
+      - !ruby/object:Api::Type::Enum
+       name: 'bgpBestPathSelectionMode'
+       min_version: beta
+       description: |
+         The BGP best selection algorithm to be employed. MODE can be LEGACY or STANDARD.
+       values:
+         - :LEGACY
+         - :STANDARD
+       update_verb: :PATCH
+       update_url: projects/{{project}}/global/networks/{{name}}
+       default_from_api: true
+      - !ruby/object:Api::Type::Boolean
+       min_version: beta
+       required: false
+       name: 'bgpAlwaysCompareMed'
+       description: |
+         Enables/disables the comparison of MED across routes with different Neighbor ASNs.
+         This value can only be set if the --bgp-best-path-selection-mode is STANDARD
+       update_verb: :PATCH
+       update_url: projects/{{project}}/global/networks/{{name}}
+       default_from_api: true
+      - !ruby/object:Api::Type::Enum
+       name: 'bgpInterRegionCost'
+       min_version: beta
+       required: false
+       description: |
+         Choice of the behavior of inter-regional cost and MED in the BPS algorithm.
+       values:
+         - :DEFAULT
+         - :ADD_COST_TO_MED
+       default_from_api: true
+       update_verb: :PATCH
+       update_url: projects/{{project}}/global/networks/{{name}}
   - !ruby/object:Api::Type::Integer
     name: 'mtu'
     description: |
