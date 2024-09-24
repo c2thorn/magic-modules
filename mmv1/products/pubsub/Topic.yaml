@@ -166,6 +166,9 @@ properties:
         name: 'awsKinesis'
         description: |
           Settings for ingestion from Amazon Kinesis Data Streams.
+        exactly_one_of:
+          - aws_kinesis
+          - cloud_storage
         properties:
           - !ruby/object:Api::Type::String
             name: 'streamArn'
@@ -197,6 +200,9 @@ properties:
       - !ruby/object:Api::Type::NestedObject
         name: 'cloudStorage'
         description: Settings for ingestion from Cloud Storage.
+        exactly_one_of:
+          - aws_kinesis
+          - cloud_storage
         properties:
           - !ruby/object:Api::Type::String
             name: 'bucket'
