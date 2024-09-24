@@ -211,6 +211,10 @@ properties:
               Configuration for reading Cloud Storage data in text format. Each line of
               text as specified by the delimiter will be set to the `data` field of a
               Pub/Sub message.
+            exactly_one_of:
+              - text_format
+              - avro_format
+              - pubsub_avro_format
             properties:
               - !ruby/object:Api::Type::String
                 name: 'delimiter'
@@ -227,6 +231,10 @@ properties:
               bytes of each object will be set to the `data` field of a Pub/Sub message.
             allow_empty_object: true
             send_empty_value: true
+            exactly_one_of:
+              - text_format
+              - avro_format
+              - pubsub_avro_format
             properties:
               []   # Meant to be an empty object with no properties.
           - !ruby/object:Api::Type::NestedObject
@@ -238,6 +246,10 @@ properties:
               will be restored when publishing.
             allow_empty_object: true
             send_empty_value: true
+            exactly_one_of:
+              - text_format
+              - avro_format
+              - pubsub_avro_format
             properties:
               []   # Meant to be an empty object with no properties.
           - !ruby/object:Api::Type::String
