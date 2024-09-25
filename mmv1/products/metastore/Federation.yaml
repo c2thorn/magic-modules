@@ -51,12 +51,9 @@ virtual_fields:
     name: 'deletion_protection'
     default_value: false
     description: |
-      Whether Terraform will be prevented from destroying the federation. Defaults to true.
-      When a`terraform destroy` or `terraform apply` would delete the federation,
-      the command will fail if this field is not set to false in Terraform state.
-      When the field is set to true or unset in Terraform state, a `terraform apply`
+      Whether Terraform will be prevented from destroying the federation. Defaults to false.
+      When the field is set to true in Terraform state, a `terraform apply`
       or `terraform destroy` that would delete the federation will fail.
-      When the field is set to false, deleting the federation is allowed.
 import_format:
   ['projects/{{project}}/locations/{{location}}/federations/{{federation_id}}']
 examples:
@@ -78,6 +75,8 @@ examples:
     vars:
       federation_id: 'metastore-fed'
       service_id: 'metastore-service'
+custom_code: !ruby/object:Provider::Terraform::CustomCode
+  pre_delete: 'templates/terraform/pre_delete/metastore_federation.go.erb'
 parameters:
   - !ruby/object:Api::Type::String
     name: 'federationId'
