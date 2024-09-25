@@ -63,6 +63,7 @@ examples:
     test_env_vars:
       project: :PROJECT_NAME
   - !ruby/object:Provider::Terraform::Examples
+    min_version: beta
     name: 'network_bgp_best_path_selection_mode'
     primary_resource_id: 'vpc_network'
     vars:
@@ -70,6 +71,7 @@ examples:
     test_env_vars:
       project: :PROJECT_NAME
   - !ruby/object:Provider::Terraform::Examples
+    min_version: beta
     name: 'network_bgp_always_compare_med'
     primary_resource_id: 'vpc_network'
     vars:
@@ -77,6 +79,7 @@ examples:
     test_env_vars:
       project: :PROJECT_NAME
   - !ruby/object:Provider::Terraform::Examples
+    min_version: beta
     name: 'network_bgp_inter_region_cost'
     primary_resource_id: 'vpc_network'
     vars:
