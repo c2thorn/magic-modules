@@ -72,7 +72,7 @@ examples:
       project: :PROJECT_NAME
   - !ruby/object:Provider::Terraform::Examples
     min_version: beta
-    name: 'network_bgp_always_compare_med'
+    name: 'network_bgp_best_path_selection_mode_standard'
     primary_resource_id: 'vpc_network'
     vars:
       network_name: 'vpc-network'
@@ -80,7 +80,7 @@ examples:
       project: :PROJECT_NAME
   - !ruby/object:Provider::Terraform::Examples
     min_version: beta
-    name: 'network_bgp_inter_region_cost'
+    name: 'network_bgp_best_path_selection_mode_standard_custom_fields'
     primary_resource_id: 'vpc_network'
     vars:
       network_name: 'vpc-network'

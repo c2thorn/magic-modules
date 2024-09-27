@@ -117,11 +117,9 @@ func TestAccComputeNetwork_routingModeAndUpdate(t *testing.T) {
 func TestAccComputeNetwork_bgpBestPathSelectionModeAndUpdate(t *testing.T) {
    t.Parallel()
 
-
    var network compute.Network
    suffixName := acctest.RandString(t, 10)
    networkName := fmt.Sprintf("tf-best-bgp-path-selection-mode-%s", suffixName)
-
 
    acctest.VcrTest(t, resource.TestCase{
        PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -133,8 +131,8 @@ func TestAccComputeNetwork_bgpBestPathSelectionModeAndUpdate(t *testing.T) {
                Check: resource.ComposeTestCheckFunc(
                    testAccCheckComputeNetworkExists(
                        t, "google_compute_network.acc_network_bgp_best_path_selection_mode", &network),
-                   testAccCheckComputeNetworkHasBgpBestPathSelectionMode(
-                       t, "google_compute_network.acc_network_bgp_best_path_selection_mode", &network, "LEGACY"),
+                   resource.TestCheckResourceAttr(
+					   "google_compute_network.acc_network_bgp_best_path_selection_mode", "RoutingConfig.BgpBestPathSelectionMode", "LEGACY"),
                ),
            },
            // Test updating the best bgp path selection field (only updatable field).
@@ -143,8 +141,8 @@ func TestAccComputeNetwork_bgpBestPathSelectionModeAndUpdate(t *testing.T) {
                Check: resource.ComposeTestCheckFunc(
                    testAccCheckComputeNetworkExists(
                        t, "google_compute_network.acc_network_bgp_best_path_selection_mode", &network),
-                   testAccCheckComputeNetworkHasBgpBestPathSelectionMode(
-                       t, "google_compute_network.acc_network_bgp_best_path_selection_mode", &network, "STANDARD"),
+                   resource.TestCheckResourceAttr(
+					   "google_compute_network.acc_network_bgp_best_path_selection_mode", "RoutingConfig.BgpBestPathSelectionMode", "STANDARD"),
                ),
            },
        },
@@ -155,11 +153,9 @@ func TestAccComputeNetwork_bgpBestPathSelectionModeAndUpdate(t *testing.T) {
 func TestAccComputeNetwork_bgpAlwaysCompareMedAndUpdate(t *testing.T) {
    t.Parallel()
 
-
    var network compute.Network
    suffixName := acctest.RandString(t, 10)
    networkName := fmt.Sprintf("tf-bgp-always-compare-med-%s", suffixName)
-
 
    acctest.VcrTest(t, resource.TestCase{
        PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -193,11 +189,9 @@ func TestAccComputeNetwork_bgpAlwaysCompareMedAndUpdate(t *testing.T) {
 func TestAccComputeNetwork_bgpInterRegionCostAndUpdate(t *testing.T) {
    t.Parallel()
 
-
    var network compute.Network
    suffixName := acctest.RandString(t, 10)
    networkName := fmt.Sprintf("tf-bgp-inter-region-cost-%s", suffixName)
-
 
    acctest.VcrTest(t, resource.TestCase{
        PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -287,14 +281,11 @@ func TestAccComputeNetwork_default_routing_mode(t *testing.T) {
 func TestAccComputeNetwork_default_bgp_best_path_selection_mode(t *testing.T) {
    t.Parallel()
 
-
    var network compute.Network
    suffixName := acctest.RandString(t, 10)
    networkName := fmt.Sprintf("tf-test-bgp-best-path-selection-default-routes-%s", suffixName)
 
-
    expectedBgpBestPathSelection := "LEGACY"
-
 
    acctest.VcrTest(t, resource.TestCase{
        PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -306,8 +297,8 @@ func TestAccComputeNetwork_default_bgp_best_path_selection_mode(t *testing.T) {
                Check: resource.ComposeTestCheckFunc(
                    testAccCheckComputeNetworkExists(
                        t, "google_compute_network.bar", &network),
-                   testAccCheckComputeNetworkHasBgpBestPathSelectionMode(
-                       t, "google_compute_network.bar", &network, expectedBgpBestPathSelection),
+                   resource.TestCheckResourceAttr(
+					   "google_compute_network.acc_network_bgp_best_path_selection_mode", "RoutingConfig.BgpBestPathSelectionMode", expectedBgpBestPathSelection),
                ),
            },
        },
@@ -318,14 +309,11 @@ func TestAccComputeNetwork_default_bgp_best_path_selection_mode(t *testing.T) {
 func TestAccComputeNetwork_default_bgp_always_compare_med(t *testing.T) {
    t.Parallel()
 
-
    var network compute.Network
    suffixName := acctest.RandString(t, 10)
    networkName := fmt.Sprintf("tf-test-bgp-always-comapre-med-default-routes-%s", suffixName)
 
-
    expectedBgpAlwaysCompareMed := false
-
 
    acctest.VcrTest(t, resource.TestCase{
        PreCheck:                 func() { acctest.AccTestPreCheck(t) },
@@ -556,17 +544,14 @@ func testAccCheckComputeNetworkHasBgpBestPathSelectionMode(t *testing.T, n strin
    return func(s *terraform.State) error {
        config := acctest.GoogleProviderConfig(t)
 
-
        rs, ok := s.RootModule().Resources[n]
        if !ok {
            return fmt.Errorf("Not found: %s", n)
        }
 
-
        if rs.Primary.Attributes["bgp_best_path_selection_mode"] == "" {
            return fmt.Errorf("BGP best path selection  not found on resource")
        }
-
 
        found, err := config.NewComputeClient(config.UserAgent).Networks.Get(
            config.Project, network.Name).Do()
@@ -574,14 +559,11 @@ func testAccCheckComputeNetworkHasBgpBestPathSelectionMode(t *testing.T, n strin
            return err
        }
 
-
        foundBgpBestPathSelection := found.RoutingConfig.BgpBestPathSelectionMode
-
 
        if bgpBestPathSelection != foundBgpBestPathSelection {
            return fmt.Errorf("Expected BGP best path selection %s to match actual BGP best path selection %s", bgpBestPathSelection, foundBgpBestPathSelection)
        }
-
 
        return nil
    }
@@ -592,17 +574,14 @@ func testAccCheckComputeNetworkHasBgpAlwaysCompareMed(t *testing.T, n string, ne
    return func(s *terraform.State) error {
        config := acctest.GoogleProviderConfig(t)
 
-
        rs, ok := s.RootModule().Resources[n]
        if !ok {
            return fmt.Errorf("Not found: %s", n)
        }
 
-
        if rs.Primary.Attributes["bgp_always_compare_med"] == "" {
            return fmt.Errorf("BGP always compare med  not found on resource")
        }
-
 
        found, err := config.NewComputeClient(config.UserAgent).Networks.Get(
            config.Project, network.Name).Do()
@@ -610,14 +589,11 @@ func testAccCheckComputeNetworkHasBgpAlwaysCompareMed(t *testing.T, n string, ne
            return err
        }
 
-
        foundBgpAlwaysCompareMed := found.RoutingConfig.BgpAlwaysCompareMed
-
 
        if foundBgpAlwaysCompareMed != bgpAlwaysCompareMed {
            return fmt.Errorf("Expected BGP always compare med %t to match actual BGP always compare med %t", bgpAlwaysCompareMed, foundBgpAlwaysCompareMed)
        }
-
 
        return nil
    }
@@ -628,17 +604,14 @@ func testAccCheckComputeNetworkHasBgpInterRegionCost(t *testing.T, n string, net
    return func(s *terraform.State) error {
        config := acctest.GoogleProviderConfig(t)
 
-
        rs, ok := s.RootModule().Resources[n]
        if !ok {
            return fmt.Errorf("Not found: %s", n)
        }
 
-
        if rs.Primary.Attributes["bgp_inter_region_cost"] == "" {
            return fmt.Errorf("BGP inter region cost  not found on resource")
        }
-
 
        found, err := config.NewComputeClient(config.UserAgent).Networks.Get(
            config.Project, network.Name).Do()
@@ -646,14 +619,11 @@ func testAccCheckComputeNetworkHasBgpInterRegionCost(t *testing.T, n string, net
            return err
        }
 
-
        foundBgpInterRegionCost := found.RoutingConfig.BgpInterRegionCost
-
 
        if foundBgpInterRegionCost != bgpInterRegionCost {
            return fmt.Errorf("Expected BGP always compare med %s to match actual BGP always compare med %s", bgpInterRegionCost, foundBgpInterRegionCost)
        }
-
 
        return nil
    }
@@ -736,7 +706,6 @@ resource "google_compute_network" "acc_network_bgp_best_path_selection_mode" {
 `, networkName, bgpBestPathSelection)
 }
 
-
 func testAccComputeNetwork_bgp_always_compare_med(networkName string, bgpAlwaysComapreMed bool) string {
    return fmt.Sprintf(`
 resource "google_compute_network" "acc_network_bgp_always_compare_med" {
@@ -747,7 +716,6 @@ resource "google_compute_network" "acc_network_bgp_always_compare_med" {
 }
 `, networkName, bgpAlwaysComapreMed)
 }
-
 
 func testAccComputeNetwork_bgp_inter_region_cost(networkName, bgpInterRegionCost string) string {
    return fmt.Sprintf(`
