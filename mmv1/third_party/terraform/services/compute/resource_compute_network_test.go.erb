@@ -540,36 +540,6 @@ func testAccCheckComputeNetworkHasRoutingMode(t *testing.T, n string, network *c
 }
 
 <% unless version == 'ga' -%>
-func testAccCheckComputeNetworkHasBgpBestPathSelectionMode(t *testing.T, n string, network *compute.Network, bgpBestPathSelection string) resource.TestCheckFunc {
-   return func(s *terraform.State) error {
-       config := acctest.GoogleProviderConfig(t)
-
-       rs, ok := s.RootModule().Resources[n]
-       if !ok {
-           return fmt.Errorf("Not found: %s", n)
-       }
-
-       if rs.Primary.Attributes["bgp_best_path_selection_mode"] == "" {
-           return fmt.Errorf("BGP best path selection  not found on resource")
-       }
-
-       found, err := config.NewComputeClient(config.UserAgent).Networks.Get(
-           config.Project, network.Name).Do()
-       if err != nil {
-           return err
-       }
-
-       foundBgpBestPathSelection := found.RoutingConfig.BgpBestPathSelectionMode
-
-       if bgpBestPathSelection != foundBgpBestPathSelection {
-           return fmt.Errorf("Expected BGP best path selection %s to match actual BGP best path selection %s", bgpBestPathSelection, foundBgpBestPathSelection)
-       }
-
-       return nil
-   }
-}
-
-
 func testAccCheckComputeNetworkHasBgpAlwaysCompareMed(t *testing.T, n string, network *compute.Network, bgpAlwaysCompareMed bool) resource.TestCheckFunc {
    return func(s *terraform.State) error {
        config := acctest.GoogleProviderConfig(t)
