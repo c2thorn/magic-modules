@@ -24,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-provider-google/google/fwprovider"
 	tpgprovider "github.com/hashicorp/terraform-provider-google/google/provider"
 	"github.com/hashicorp/terraform-provider-google/google/services/compute"
+	"github.com/hashicorp/terraform-provider-google/google/services/sql"
 	"github.com/hashicorp/terraform-provider-google/google/tpgresource"
 	transport_tpg "github.com/hashicorp/terraform-provider-google/google/transport"
 
@@ -31,6 +32,8 @@ import (
 	"github.com/dnaeon/go-vcr/recorder"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	fwResource "github.com/hashicorp/terraform-plugin-framework/resource"
+
 	fwDiags "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
@@ -405,6 +408,14 @@ func (p *frameworkTestProvider) DataSources(ctx context.Context) []func() dataso
 	ds = append(ds, fwprovider.NewGoogleProviderConfigPluginFrameworkDataSource) // google_provider_config_plugin_framework
 	ds = append(ds, compute.NewComputeNetworkFWDataSource)                       // google_fw_compute_network
 	return ds
+}
+
+// Resources overrides the provider's Resources function so that we can append test-specific resources
+// Similar to the Datasources override
+func (p *frameworkTestProvider) Resources(ctx context.Context) []func() fwResource.Resource {
+	rs := p.FrameworkProvider.Resources(ctx)
+	rs = append(rs, sql.NewSQLUserFWResource) // google_fw_sql_user
+	return rs
 }
 
 // GetSDKProvider gets the SDK provider for use in acceptance tests
