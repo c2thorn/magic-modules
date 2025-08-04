@@ -17,8 +17,8 @@ import (
 
 // ParseImportId uses a list of regular expressions to parse a resource's import ID.
 // It extracts named capture groups from the regex and converts them to their
-// corresponding, type-safe attribute values based on the provided resource schema.
-// It also handles setting default values (e.g., project, region) if they are not
+// corresponding type-safe attribute values based on the provided resource schema.
+// It also handles setting default values (project, region, etc) if they are not
 // present in the import ID.
 func ParseImportId(
 	ctx context.Context,
