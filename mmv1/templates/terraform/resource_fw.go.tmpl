@@ -272,6 +272,16 @@ func (r *{{$.ResourceName}}FWResource) Create(ctx context.Context, req resource.
 		return
 	}
 
+{{- if $.Mutex }}
+	{
+	lockName := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{ $.Mutex }}")
+	if resp.Diagnostics.HasError() { return }
+
+	transport_tpg.MutexStore.Lock(lockName)
+	defer transport_tpg.MutexStore.Unlock(lockName)
+	}
+{{- end }}
+
     url := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{"{{"}}{{$.ProductMetadata.Name}}BasePath{{"}}"}}{{$.CreateUri}}")
     if resp.Diagnostics.HasError() {
         return
@@ -488,8 +498,19 @@ func (r *{{$.ResourceName}}FWResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-    url := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{"{{"}}{{$.ProductMetadata.Name}}BasePath{{"}}"}}{{$.CreateUri}}")
-    if resp.Diagnostics.HasError() {
+{{- if $.Mutex }}
+	{
+	lockName := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{ $.Mutex }}")
+	if resp.Diagnostics.HasError() { return }
+
+	transport_tpg.MutexStore.Lock(lockName)
+	defer transport_tpg.MutexStore.Unlock(lockName)
+	}
+{{- end }}
+
+    url := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{"{{"}}{{$.ProductMetadata.Name}}BasePath{{"}}"}}{{$.UpdateUri}}")
+
+	if resp.Diagnostics.HasError() {
         return
     }
 
@@ -628,6 +649,16 @@ func (r *{{$.ResourceName}}FWResource) Delete(ctx context.Context, req resource.
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+{{- if $.Mutex }}
+	{
+	lockName := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{ $.Mutex }}")
+	if resp.Diagnostics.HasError() { return }
+
+	transport_tpg.MutexStore.Lock(lockName)
+	defer transport_tpg.MutexStore.Unlock(lockName)
+	}
+{{- end }}
 
     url := fwtransport.ReplaceVars(ctx, req, &resp.Diagnostics, schemaDefaultVals, r.providerConfig, "{{"{{"}}{{$.ProductMetadata.Name}}BasePath{{"}}"}}{{$.DeleteUri}}")
     if resp.Diagnostics.HasError() {
