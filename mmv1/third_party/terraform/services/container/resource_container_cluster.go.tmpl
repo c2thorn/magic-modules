@@ -3516,13 +3516,12 @@ func resourceContainerClusterRead(d *schema.ResourceData, meta interface{}) erro
                 return fmt.Errorf("Error setting allow_net_admin: %s", err)
             }
         }
-		if autopilot.PrivilegedAdmissionConfig != nil {
-			allowlistPaths := autopilot.PrivilegedAdmissionConfig.AllowlistPaths
-			if len(allowlistPaths) > 0 {
-				if err := d.Set("autopilot_privileged_admission", allowlistPaths); err != nil {
-					return fmt.Errorf("Error setting autopilot_privileged_admission: %s", err)
-				}
-			}
+		var allowlistPaths []string
+		if autopilot.PrivilegedAdmissionConfig != nil && len(autopilot.PrivilegedAdmissionConfig.AllowlistPaths) > 0 {
+			allowlistPaths = autopilot.PrivilegedAdmissionConfig.AllowlistPaths
+		}
+		if err := d.Set("autopilot_privileged_admission", allowlistPaths); err != nil {
+			return fmt.Errorf("Error setting autopilot_privileged_admission: %s", err)
 		}
 	}
 	if cluster.ShieldedNodes != nil {
@@ -8524,7 +8523,9 @@ func containerClusterAutopilotPrivilegedAdmissionCustomizeDiff(_ context.Context
 
 	old, new := d.GetChange("autopilot_privileged_admission")
 	if isDefaulted(old) && isDefaulted(new) {
-		return d.Clear("autopilot_privileged_admission")
+		if err := d.SetNew("autopilot_privileged_admission", old); err != nil {
+			return fmt.Errorf("Error setting autopilot_privileged_admission: %s", err)
+		}
 	}
 
 	return nil
