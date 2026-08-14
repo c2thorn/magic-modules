@@ -81,9 +81,7 @@ func (l *Loader) LoadProducts() {
 		allProductFiles = append(allProductFiles, fmt.Sprintf("products/%s", filepath.Base(dir)))
 	}
 
-	log.Printf("Using base directory %q", l.baseDirectory)
 	if l.overrideDirectory != "" {
-		log.Printf("Using override directory %q", l.overrideDirectory)
 		overrideFiles, err := filepath.Glob(filepath.Join(l.overrideDirectory, "products/**/product.yaml"))
 		if err != nil {
 			panic(err)

@@ -68,7 +68,6 @@ func (toics TerraformOiCS) GenerateObject(object api.Resource, outputFolder, res
 	templateData := NewTemplateData(outputFolder, toics.TargetVersionName, toics.templateFS)
 
 	if !object.IsExcluded() {
-		log.Printf("Generating %s resource", object.Name)
 		toics.GenerateResource(object, *templateData, outputFolder, generateCode, generateDocs)
 	}
 }

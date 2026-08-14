@@ -262,8 +262,6 @@ func (tgc TerraformGoogleConversionNext) CopyCommonFiles(outputFolder string, ge
 		return
 	}
 
-	log.Printf("Copying common files for tgc.")
-
 	if err := os.MkdirAll(outputFolder, os.ModePerm); err != nil {
 		log.Println(fmt.Errorf("error creating output directory %v: %v", outputFolder, err))
 	}

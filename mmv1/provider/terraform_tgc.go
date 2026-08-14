@@ -185,8 +185,6 @@ func (tgc *TerraformGoogleConversion) generateCaiIamResources(products []*api.Pr
 }
 
 func (tgc TerraformGoogleConversion) CompileCommonFiles(outputFolder string, products []*api.Product, overridePath string) {
-	log.Printf("Compiling common files for tgc.")
-
 	templateData := NewTemplateData(outputFolder, tgc.TargetVersionName, tgc.templateFS)
 
 	resourceConverters := map[string]string{
@@ -373,8 +371,6 @@ func retrieveListOfManuallyDefinedTestsFromFile(fsys fs.FS, file string) []strin
 }
 
 func (tgc TerraformGoogleConversion) CopyCommonFiles(outputFolder string, generateCode, generateDocs bool) {
-	log.Printf("Copying common files for tgc.")
-
 	if !generateCode {
 		return
 	}

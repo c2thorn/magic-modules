@@ -48,7 +48,6 @@ endif
 ifeq ($(USE_BAZEL), 1)
 	MM_BINARY=../bazel-bin/mmv1/mmv1_/mmv1
 else
-	_ := $(shell printf "\e[1;33mWARNING:\e[0m magic-modules will start requiring installation of bazel for builds in the near future. You can opt in now by installing bazel (recommended: use bazelisk): https://bazel.build/install\n" 1>&2)
 	MM_BINARY=../bin/mmv1
 endif
 
@@ -56,7 +55,6 @@ terraform build provider: validate_environment clean-provider mmv1
 	@echo "Provider generation process finished for $(VERSION) in $(OUTPUT_PATH)"
 
 mm_binary:
-	@echo "Building mmv1 binary";
 	@if [ "$(USE_BAZEL)" != "1" ]; then \
 		cd mmv1 && go build -o $(MM_BINARY) .; \
 	else \
@@ -72,7 +70,6 @@ mm_binary:
 	fi
 
 mmv1: mm_binary
-	@echo "Executing mmv1 build for $(OUTPUT_PATH)";
 	@cd mmv1;\
 		if [ "$(VERSION)" = "ga" ]; then \
 			$(MM_BINARY) --output $(OUTPUT_PATH) --version ga --no-docs $(mmv1_args) \
@@ -90,24 +87,18 @@ clean-provider: check_safe_build
 	elif [ "$(SHOULD_SKIP_CLEAN)" = "true" ]; then \
 		printf "\e[1;33mINFO:\e[0m Skipping clean-provider step because SKIP_CLEAN is set to a non-false value ('$(SKIP_CLEAN)').\n"; \
 	else \
-		echo "Executing clean-provider in $(OUTPUT_PATH)..."; \
 		( \
 			cd $(OUTPUT_PATH) && \
-			echo "---> Changing directory to $(OUTPUT_PATH)" && \
 			if ! command -v git > /dev/null 2>&1; then \
 				printf "\e[1;33mINFO:\e[0m Skipping git-based cleaning because git is not installed.\n"; \
 			elif ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then \
 				printf "\e[1;33mINFO:\e[0m Skipping git-based cleaning because $(OUTPUT_PATH) is not a git repository.\n"; \
 			else \
-				echo "---> Downloading Go module dependencies... (Ensures tools like gofmt can find relevant code)" && \
 				go mod download && \
-				echo "---> Finding tracked files to remove..." && \
 				git ls-files | grep -v -E '(^\.git|^\.changelog|^\.agents/|^\.travis\.yml$$|^\.golangci\.yml$$|^CHANGELOG\.md$$|^CHANGELOG_v.*\.md$$|^GNUmakefile$$|docscheck\.sh$$|^\.whitesource$$|^LICENSE$$|^CODEOWNERS$$|^README\.md$$|^\.go-version$$|^\.hashibot\.hcl$$|^go\.mod$$|^go\.sum$$|^examples|^scripts/)' | xargs -r git rm -f -q && \
-				echo "---> Unstaging changes with git reset..." && \
-				git reset -q && \
-				echo "---> clean-provider actions finished. Changes have been unstaged."; \
+				git reset -q; \
 			fi \
-		) && echo "clean-provider target finished successfully."; \
+		); \
 	fi
 
 clean-tgc:

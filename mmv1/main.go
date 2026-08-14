@@ -43,6 +43,8 @@ var doNotGenerateDocs = flag.Bool("no-docs", false, "do not generate docs")
 
 var providerFlag = flag.String("provider", "", "optional provider name. If specified, a non-default provider will be used.")
 
+var verboseFlag = flag.Bool("verbose", false, "log verbose details during generation")
+
 var openapiGenerate = flag.Bool("openapi-generate", false, "Generate MMv1 YAML from openapi directory (Experimental)")
 
 func main() {
@@ -61,12 +63,14 @@ func main() {
 		return
 	}
 
-	GenerateProducts(*productFlag, *resourceFlag, *providerFlag, *versionFlag, *outputPathFlag, *baseDirectoryFlag, *overrideDirectoryFlag, !*doNotGenerateCode, !*doNotGenerateDocs)
+	GenerateProducts(*productFlag, *resourceFlag, *providerFlag, *versionFlag, *outputPathFlag, *baseDirectoryFlag, *overrideDirectoryFlag, !*doNotGenerateCode, !*doNotGenerateDocs, *verboseFlag)
 }
 
-func GenerateProducts(product, resource, providerName, version, outputPath, baseDirectory, overrideDirectory string, generateCode, generateDocs bool) {
+func GenerateProducts(product, resource, providerName, version, outputPath, baseDirectory, overrideDirectory string, generateCode, generateDocs, verbose bool) {
 	if version == "" {
-		log.Printf("No version specified, assuming ga")
+		if verbose {
+			log.Printf("No version specified, assuming ga")
+		}
 		version = "ga"
 	}
 	if baseDirectory == "" {
@@ -80,9 +84,11 @@ func GenerateProducts(product, resource, providerName, version, outputPath, base
 	if providerName == "" {
 		providerName = "default (terraform)"
 	}
-	log.Printf("Generating MM output to %q", outputPath)
-	log.Printf("Building %q version", version)
-	log.Printf("Building %q provider", providerName)
+	if verbose {
+		log.Printf("Generating MM output to %q", outputPath)
+		log.Printf("Building %q version", version)
+		log.Printf("Building %q provider", providerName)
+	}
 
 	ofs, err := google.NewOverlayFS(overrideDirectory, baseDirectory)
 	if err != nil {
@@ -131,7 +137,9 @@ func GenerateProducts(product, resource, providerName, version, outputPath, base
 		providerToGenerate.CompileCommonFiles(outputPath, productsForVersion, "")
 	}
 
-	log.Printf("Done MM generation.")
+	if verbose {
+		log.Printf("Done MM generation.")
+	}
 }
 
 // GenerateProduct generates code and documentation for a product
@@ -142,11 +150,9 @@ func GenerateProduct(version, providerName string, productApi *api.Product, outp
 	defer wg.Done()
 
 	if !slices.Contains(productsToGenerate, productApi.PackagePath) {
-		log.Printf("%s not specified, skipping generation", productApi.PackagePath)
 		return
 	}
 
-	log.Printf("%s: Generating files", productApi.PackagePath)
 	providerToGenerate := newProvider(providerName, version, productApi, startTime, fsys)
 	providerToGenerate.Generate(outputPath, resourceToGenerate, generateCode, generateDocs)
 
