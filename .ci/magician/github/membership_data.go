@@ -125,14 +125,6 @@ var (
 				},
 			},
 		},
-		"ScottSuarez": {
-			vacations: []Vacation{
-				{
-					startDate: newDate(2026, 4, 4),
-					endDate:   newDate(2026, 7, 5),
-				},
-			},
-		},
 		"SirGitsalot": {
 			vacations: []Vacation{
 				{
@@ -167,5 +159,6 @@ var (
 		"trodge":            {},
 		"zli82016":          {},
 		"vr-ibm":            {},
+		"ScottSuarez":       {},
 	}
 )
