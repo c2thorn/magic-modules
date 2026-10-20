@@ -165,15 +165,16 @@ var (
 
 	// This is for new team members who are onboarding
 	trustedContributors = map[string]struct{}{
-		"BBBmau":            {},
-		"malhotrasagar2212": {},
-		"bbasata":           {},
-		"tavasyag":          {},
-		"hao-nan-li":        {},
-		"NickElliot":        {},
-		"shuyama1":          {},
-		"trodge":            {},
-		"zli82016":          {},
-		"vr-ibm":            {},
+		"BBBmau":               {},
+		"malhotrasagar2212":    {},
+		"bbasata":              {},
+		"tavasyag":             {},
+		"hao-nan-li":           {},
+		"NickElliot":           {},
+		"shuyama1":             {},
+		"trodge":               {},
+		"zli82016":             {},
+		"vr-ibm":               {},
+		"Terraform-Google-SEA": {},
 	}
 )
