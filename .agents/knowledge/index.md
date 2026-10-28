@@ -24,6 +24,7 @@ Read this index at decision points; open only the source the task needs. Format 
 - Fix diffs and permadiffs — `docs/content/develop/diffs.md`
 - Client-side fields — `docs/content/develop/client-side-fields.md`
 - Promote beta → GA — `docs/content/develop/promote-to-ga.md`
+- Add TGC conversion (`include_in_tgc_next`, `is_missing_in_cai`) — `docs/content/convert/add-new-resource-tgc.md`
 - Update provider dependencies (`go.mod` / `go.sum`) — `docs/content/develop/update-dependencies.md`
 - Generate the providers / set up the environment — `docs/content/develop/generate-providers.md`, `docs/content/develop/set-up-dev-environment.md`
 
@@ -59,6 +60,9 @@ Read this index at decision points; open only the source the task needs. Format 
 ### Field (`field/`)
 
 - **enums-vs-strings** — Model an API enum as Enum (strict, plan-time) or String (forward-compatible): the deliberate trade-off. — [field/enums-vs-strings.md](field/enums-vs-strings.md)
+- **zero-value-clearing** — Clear mutable fields back to false, 0, "", or {} on PATCH using send_empty_value, allow_empty_object, or GetRawConfig. — [field/zero-value-clearing.md](field/zero-value-clearing.md)
+- **permadiff-decision-path** — Choose the right schema attribute or custom hook to eliminate post-apply diffs without masking real drift. — [field/permadiff-decision-path.md](field/permadiff-decision-path.md)
+- **cross-schema-field-sync** — Keep paired *Version.yaml snapshot schemas and TGC is_missing_in_cai flags synchronized when adding fields. — [field/cross-schema-field-sync.md](field/cross-schema-field-sync.md)
 
 ### Template (`template/`)
 
@@ -71,3 +75,4 @@ Read this index at decision points; open only the source the task needs. Format 
 ### Test (`test/`)
 
 - **unit-test-scope** — When to write unit tests vs acceptance tests, and avoiding test bloat. — [test/unit-test-scope.md](test/unit-test-scope.md)
+- **test-adequacy-traps** — Avoid false-positive acceptance tests from broken CheckDestroy templates, unmutated update steps, or ExpectError-only steps. — [test/test-adequacy-traps.md](test/test-adequacy-traps.md)

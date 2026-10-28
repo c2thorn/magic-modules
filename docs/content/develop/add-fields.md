@@ -187,6 +187,8 @@ For `key_name`, provide a domain-appropriate field name. For example, a map that
 {{< /tabs >}}
 
 2. Modify the field configuration according to the API documentation and behavior.
+   - Check the same product directory for paired immutable snapshot schemas (such as `<Resource>Version.yaml` alongside `<Resource>.yaml`, e.g., `AppVersion.yaml` or `ToolVersion.yaml`). If the API exposes the new field inside version snapshots, mirror the field with `output: true` in the paired snapshot schema.
+   - If the resource sets `include_in_tgc_next: true` and the new field is not yet present in Cloud Asset Inventory's asset schema, set `is_missing_in_cai: true` on the field (see [Add TGC conversion]({{< ref "/convert/add-new-resource-tgc" >}})).
 
 > **Note:** The templates in this section only include the most commonly-used fields. For a comprehensive reference, see [MMv1 field reference]({{<ref "/reference/field" >}}). For information about modifying the values sent and received for a field, see [Modify the API request or response]({{<ref "/develop/custom-code#modify-the-api-request-or-response" >}}).
 {{< /tab >}}
@@ -199,7 +201,7 @@ To add a field:
 
 1. Add the field to the handwritten resource's schema.
    - The new field(s) should mirror the API's structure to ease predictability and maintenance. However, if there is an existing related / similar field in the resource that uses a different convention, follow that convention instead.
-   - Enum fields in the API should be represented as `TypeString` in Terraform for forwards-compatibility. Link to the API documentation of allowed values in the field description.
+   - Enum fields in the API should be represented as `TypeString` in Terraform for forwards-compatibility. Link to the API documentation of allowed values in the field description. When `validation.StringInSlice` is used on an `Optional: true, Computed: true` field without diff suppression, omit proto zero-value `*_UNSPECIFIED` entries unless the API persists and distinguishes `*_UNSPECIFIED` as a valid user-settable value.
    - Terraform field names should always use [snake case ↗](https://en.wikipedia.org/wiki/Snake_case).
    - See [Schema Types ↗](https://developer.hashicorp.com/terraform/plugin/sdkv2/schemas/schema-types) and [Schema Behaviors ↗](https://developer.hashicorp.com/terraform/plugin/sdkv2/schemas/schema-behaviors) for more information about field schemas.
 2. Add handling for the new field in the resource's Create method and Update methods.

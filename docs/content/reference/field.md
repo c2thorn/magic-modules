@@ -170,7 +170,7 @@ strings) to the API if set explicitly in the user's configuration. If false,
 "empty" values cause the field to be omitted entirely from the API request.
 This attribute is useful for fields where the API would behave differently
 for an "empty" value vs no value for a particular field - for example,
-boolean fields that have an API-side default of true.
+boolean fields that have an API-side default of true, or mutable fields updated via `PATCH` where transitioning from a non-zero value back to `false`, `0`, or `""` must include the zero value in the request body alongside `updateMask`.
 
 If true simulataneously with `default_from_api`, the provider will send empty values
 explicitly set in configuration. If the field is unset, the provider will
@@ -368,6 +368,8 @@ See [Best practices: Validation]({{< ref "/best-practices/validation" >}}) for m
 
 Do not include UNSPECIFIED values in this list.
 
+Magic Modules automatically appends `Possible values` from `enum_values` to both the generated Terraform schema description and the website markdown documentation for `Enum` fields (and `Array` of `Enum` items). Do not manually list `Possible values:` in `description` on an `Enum` field, or the rendered documentation will duplicate the list.
+
 Enums will validate that the provided field is in the allowed list unless a
 custom [`validation`]({{<ref "#validation" >}}) is provided.
 
@@ -506,4 +508,15 @@ properties:
     type: String
     description: |
       MULTI_LINE_FIELD_DESCRIPTION
+```
+
+### `allow_empty_object`
+NestedObject only. If true, allows an empty configuration block (`field_name {}`) where all child properties are optional or omitted, instead of treating an all-empty block as unset. Pair with `send_empty_value: true` when the API expects an explicit `{}` object in the request payload to enable a feature or select a `oneof` branch.
+
+```yaml
+- name: 'featureEnabled'
+  type: NestedObject
+  allow_empty_object: true
+  send_empty_value: true
+  properties: []
 ```

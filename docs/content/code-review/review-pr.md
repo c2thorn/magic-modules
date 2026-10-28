@@ -38,7 +38,8 @@ to review by repository maintainers. For community members, this is not required
       > [!NOTE]
       > Note:
       > Presubmit VCR tests do not run in GA. Manual testing is required for promoted GA features.
-   1. newly added or modified diff suppress functions are tested in at least one unit test.
+   1. newly added or modified custom diff suppress functions, validators, or parsers with non-trivial branching or normalization logic are tested in at least one unit test (not required when reusing standard `tpgresource` suppressors or trivial CRUD hooks covered by acceptance tests).
+   1. when deprecating a field in a minor release (without removing it yet), existing acceptance tests that exercise the deprecated field remain intact until major-release removal, with separate test coverage added for any replacement field.
    1. the linked issue (if any) is covered by at least one test that reproduces the issue
       * for example - a bugfix should test the bug (or explain why it's not feasible to do so in the description, including manual results when possible) and an enhancement should test the new behaviour(s).
    1. all related PR presubmit tests have been completed successfully, including:

@@ -37,7 +37,7 @@ Use `custom_code.constants` to inject top-level code in a resource file. This is
   CustomizeDiff functions, and so on.
 - Methods
 
-Any custom functions added should have thorough [unit tests]({{< ref "/test/test#add-unit-tests" >}}).
+Custom functions with non-trivial logic (such as regexes, ID/URL parsers, state upgraders, or diff suppressors with custom normalization or branching) should have [unit tests]({{< ref "/test/test#add-unit-tests" >}}). Trivial wrappers or reuse of existing `tpgresource` helpers are covered by acceptance tests.
 
 ## Modify the API request or response
 
@@ -281,6 +281,48 @@ docs:
 ```
 
 See [Add documentation (Handwritten)]({{< ref "/document/add-documentation" >}}) for more information about what to include in the field documentation.
+
+## Customize test destroy checks
+
+```yaml
+custom_code:
+  test_check_destroy: templates/terraform/custom_check_destroy/PRODUCT_RESOURCE.go.tmpl
+```
+
+Use `custom_code.test_check_destroy` only when the generated `CheckDestroy` function cannot verify deletion via the standard resource `self_link` (for example, when `GET` returns `200 OK` with a soft-deleted state, or when a singleton sub-object is cleared rather than returning `404`).
+
+Because `test_check_destroy` is injected inside `for name, rs := range s.RootModule().Resources`, custom templates must uphold three invariants:
+
+1. Confirm deletion explicitly via HTTP `404` (`transport_tpg.IsGoogleApiErrorWithCode(err, 404)`) or the expected deleted response state—never assume any non-nil `err` means the resource was deleted, or a `400 Bad Request` from a malformed URL will falsely pass `CheckDestroy`.
+2. Use `continue` (not `return nil`) once a resource is confirmed deleted so remaining resources in state are also checked.
+3. Return `err` on unexpected API errors, and preserve eventual-consistency retry loops when deletion is asynchronous.
+
+```go
+config := acctest.GoogleProviderConfig(t)
+
+url, err := tpgresource.ReplaceVarsForTest(config, rs, "{{ProductBasePath}}projects/{{project}}/locations/{{location}}/resources/{{name}}")
+if err != nil {
+	return err
+}
+
+res, err := transport_tpg.SendRequest(transport_tpg.SendRequestOptions{
+	Config:    config,
+	Method:    "GET",
+	Project:   config.BillingProject,
+	RawURL:    url,
+	UserAgent: config.UserAgent,
+})
+if err != nil {
+	if transport_tpg.IsGoogleApiErrorWithCode(err, 404) {
+		continue
+	}
+	return err
+}
+if state, ok := res["state"].(string); ok && state == "DELETED" {
+	continue
+}
+return fmt.Errorf("ProductResource still exists at %s", url)
+```
 
 ## What's next?
 

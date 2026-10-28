@@ -17,19 +17,17 @@ Below are the steps you can follow to make the change:
    ```bash
    cd $GOPATH/src/github.com/hashicorp/terraform-provider-google
    ``` 
-2. Open the [`go.mod`](https://github.com/hashicorp/terraform-provider-google/blob/main/go.mod) file and add the new entries or modify the versions of existing entries as needed
-3. Update dependencies using either of the following methods
-   * run the following commands to update all dependencies: 
+2. Update dependencies using the narrowest command that matches your goal (do not run bare `go get` without arguments):
+   * To add or upgrade a specific package to a target version (preferred when unblocking a feature or fix):
    ```bash
-   go get
+   go get google.golang.org/api@v0.214.0
    go mod tidy
    ```
-   * Alternatively, update a specific package to a desired version:
+   * To upgrade all module and test dependencies across the provider (for dedicated dependency-maintenance PRs only):
    ```bash
-   go get google.golang.org/api@v0.105.0 
+   go get -u ./...
    go mod tidy
    ```
-4. Copy the contents of the updated `go.mod` and `go.sum` file into [`mmv1/third_party/terraform/go.mod`](https://github.com/GoogleCloudPlatform/magic-modules/blob/main/mmv1/third_party/terraform/go.mod) and [`mmv1/third_party/terraform/go.sum`](https://github.com/GoogleCloudPlatform/magic-modules/blob/main/mmv1/third_party/terraform/go.sum) in the `magic-modules` respectively.
-5. Create a pull request containing _only_ the dependency changes.
-6. Resolve any errors caused by the dependency upgrade.
-7. After the dependency pull request is merged, continue with a separate pull request for any additional changes that were blocked by the upgrade.
+3. Copy the contents of the updated `go.mod` and `go.sum` files into [`mmv1/third_party/terraform/go.mod`](https://github.com/GoogleCloudPlatform/magic-modules/blob/main/mmv1/third_party/terraform/go.mod) and [`mmv1/third_party/terraform/go.sum`](https://github.com/GoogleCloudPlatform/magic-modules/blob/main/mmv1/third_party/terraform/go.sum) in `magic-modules` respectively.
+4. Resolve any build or test errors caused by the dependency upgrade.
+5. For broad or multi-package upgrades, open a standalone pull request containing _only_ the dependency changes (plus any required compatibility fixes) before opening follow-up PRs. When a feature or bugfix PR depends on newly added fields in a single targeted client bump such as `google.golang.org/api`, including that targeted `go.mod`/`go.sum` update in the same PR is acceptable provided there is no unrelated dependency churn.
