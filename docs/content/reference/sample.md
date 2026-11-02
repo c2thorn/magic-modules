@@ -29,6 +29,14 @@ These attributes are defined once for an entire sample.
 * `external_providers`: A list of external providers (such as `random`, `time`) needed for the sample.
 * `tgc_skip_test`: Skips generated conversion tests specifically running inside the TGC (Terraform Google Conversion) suite (value should be a ticket link reason).
 
+### Sample Ordering & `FirstTestConfig()`
+
+Magic Modules uses `FirstTestConfig()` (`mmv1/api/resource.go`) to select the first sample (`samples[0]`) as the base test configuration for generated IAM tests (`*_iam_test.go`) and datasource tests. Placing a GA-compatible, minimal basic sample as the first entry in `samples` ensures generated IAM and datasource tests compile and execute cleanly in both GA and Beta providers.
+
+### Regional Locations in Samples
+
+HCL sample templates (`mmv1/templates/terraform/examples/*.tf.tmpl` and step configurations) routinely specify literal supported GCP regions and zones (such as `"us-central1"` or `"europe-west4"`) when an API requires regional placement. Only declare template variables in `test_env_vars` or `resource_id_vars` when dynamic test environment substitution is required.
+
 ---
 
 ## Step Attributes

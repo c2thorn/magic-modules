@@ -28,8 +28,8 @@ last_verified: 2026-10-28
 ```
 
 **Rules for Enum (MMv1 YAML):**
-- Omit the `FIELD_NAME_UNSPECIFIED` value from `enum_values` — it is the proto convention's first enum
-  value, representing 0/unset, not a real choice.
+- Omit the `FIELD_NAME_UNSPECIFIED` value from `enum_values` on user-configurable (`Optional` / `Required`) fields — it is the proto convention's first enum value representing 0/unset, not a real user choice.
+- **Exemption for Read-Only Fields:** Fields marked `output: true` (pure `Computed`) are explicitly exempt from omitting `*_UNSPECIFIED`. MMv1 generates no client-side `ValidateFunc` for `output: true` fields (`mmv1/templates/terraform/schema_property.go.tmpl`), and APIs legitimately return `*_UNSPECIFIED` as an initial or transient state during asynchronous provisioning.
 - Do **not** manually write `Possible values:` or `Possible values are:` in `description:` on a `type: Enum`
   field (or an `Array` of `Enum`). **Why:** MMv1 templates (`property_documentation.html.markdown.tmpl` and
   `schema_property.go.tmpl`) automatically append `Possible values are: ...` / `Possible values: [...]`
@@ -42,8 +42,9 @@ link to the API docs (since MMv1 does not auto-append `Possible values` for `typ
 users only discover an invalid value when the API rejects it mid-apply.
 
 **Rule for Handwritten Go Schemas (`validation.StringInSlice`):**
-- On `Optional: true, Computed: true` `TypeString` fields without diff suppression, omit proto `0`-value
+- On user-configurable `Optional: true, Computed: true` `TypeString` fields without diff suppression, omit proto `0`-value
   `*_UNSPECIFIED` entries from `validation.StringInSlice` unless the API genuinely persists and distinguishes
-  `*_UNSPECIFIED` as a user-settable or reset value.
+  `*_UNSPECIFIED` as a user-settable or reset value. Read-only (`Computed: true` with `Optional: false, Required: false`)
+  fields do not generate `ValidateFunc` and may retain `*_UNSPECIFIED`.
 - **Why:** Allowing users to configure `"FOO_UNSPECIFIED"` when the API omits or normalizes unset values on
   `GET` (or returns `"FOO_UNSPECIFIED"` when omitted) creates immediate unset-vs-`*_UNSPECIFIED` permadiffs.

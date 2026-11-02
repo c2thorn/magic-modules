@@ -154,8 +154,8 @@ func flatten{{$.GetPrefix}}{{$.TitlelizeProperty}}(v interface{}, d *schema.Reso
 
 The parameters the function receives are:
 
-- `v`: The value for the field
-- `d`:  Terraform resource data. Use `d.Get("field_name")` to get a field's current value.
+- `v`: The value for the field returned by the API. Flatteners for fields present in the API response must populate values unconditionally from `v` so `terraform import` (where `d` begins with only `id`) captures complete server state.
+- `d`: Terraform resource data. Reserve reading prior state via `d.Get("field_name")` inside a flattener strictly for genuine write-only or sensitive inputs that the API intentionally omits on `GET` (such as `mmv1/templates/terraform/custom_flatten/alloydb_cluster_input_user_flatten.go.tmpl`, paired with `ImportStateVerifyIgnore` in acceptance tests).
 - `config`: Config object. Can be used to make API calls.
 
 The function returns a final value that will be stored in Terraform state for the field, which will be compared with the user's configuration to determine if there is a diff.
@@ -323,6 +323,17 @@ if state, ok := res["state"].(string); ok && state == "DELETED" {
 }
 return fmt.Errorf("ProductResource still exists at %s", url)
 ```
+
+## Template files in `mmv1/third_party/terraform/`
+
+Files named with the `.tmpl` extension under `mmv1/third_party/terraform/` must contain at least one Go template directive (`{{ ... }}`) to pass repository validation (`TestTemplatesStillNeedToBeTemplates` in `mmv1/validate_third_party_test.go`). Pure static Go files with no templating directives must use the `.go` extension directly.
+
+## SDKv2 vs. Plugin Framework resource diff inspection
+
+When writing custom diff functions, expanders, or CRUD helpers, use the APIs appropriate for the resource framework:
+
+- **SDKv2 resources** (`github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema`): Inspect diff state using SDKv2 methods on `schema.ResourceDiff` or `schema.ResourceData`: `d.NewValueKnown("field")`, `d.GetOk("field")`, `d.GetChange("field")`, and `rd.GetRawConfigAt(path)`.
+- **Plugin Framework resources** (`tpgframework`): Framework methods such as `.IsKnown()` or `basetypes.*` apply exclusively to Plugin Framework resources. Do not use Framework methods on SDKv2 schema objects.
 
 ## What's next?
 

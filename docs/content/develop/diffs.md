@@ -52,6 +52,8 @@ See [SDKv2 Schema Behaviors - Default ↗](https://developer.hashicorp.com/terra
 
 For existing fields (or new fields that are not eligible for a client-side default), mark the field as having an API-side default. If the field is not set (or is set to an "empty" value such as zero, false, or an empty string) the provider will treat the most recent value returned by the API as the value for the field, and will send that value for the field on subsequent requests. The field will show as `(known after apply)` in plans and it will not be possible for the user to explicitly set the field to an "empty" value.
 
+Set `default_from_api: true` (`Optional` + `Computed`) only when omitting the field on `Create` causes the API's `GET` response to return a materialized non-empty value on the wire (which would otherwise cause a post-create diff). When an API description mentions a conceptual backend default while `GET` omits the field when unset, keep the field pure `Optional` so users retain the ability to unset or clear it in HCL.
+
 {{% tabs "default_from_api" %}}
 {{< tab "MMv1" >}}
 ```yaml
@@ -82,6 +84,12 @@ See [SDKv2 Schema Behaviors - Optional ↗](https://developer.hashicorp.com/terr
 See [SDKv2 Schema Behaviors - Optional ↗](https://developer.hashicorp.com/terraform/plugin/sdkv2/schemas/schema-behaviors#optional) and [SDKv2 Schema Behaviors - Computed ↗](https://developer.hashicorp.com/terraform/plugin/sdkv2/schemas/schema-behaviors#computed) for more information.
 {{< /tab >}}
 {{% /tabs %}}
+
+### Server-populated defaults on `ForceNew` fields
+
+When an unconfigured `ForceNew` field receives a server-populated default value on `GET`, handle the diff using a `DiffSuppressFunc` (such as `tpgresource.EmptyOrDefaultStringSuppress(...)`) or a separate computed `effective_*` attribute rather than branching on `d.GetOk` inside `Read`.
+
+Branching on `d.GetOk` in `Read` to keep state empty breaks `terraform import`: import populates server values directly into prior state, causing `d.GetOk` on the subsequent `terraform plan` to find the imported value and trigger an unwanted `ForceNew` resource recreation.
 
 ## API returns an empty value if default value is sent {#default_if_empty}
 
@@ -175,7 +183,7 @@ See [SDKv2 Schema Behaviors - DiffSuppressFunc ↗](https://developer.hashicorp.
 
 ## API field that is never included in the response {#ignore_read}
 
-This is common for fields that store credentials or similar information. Such fields should also be marked as [`sensitive`]({{< ref "/reference/field#sensitive" >}}).
+This is common for sensitive one-time inputs (such as OAuth authorization codes, initial setup tokens, or write-only passwords) accepted on `POST` or `PATCH` and intentionally omitted by the API on `GET`. Such fields should be marked with `ignore_read: true` (or `write_only: true`) and [`sensitive`]({{< ref "/reference/field#sensitive" >}}), and added to `ImportStateVerifyIgnore` in acceptance tests. Normal fields returned by the API on `GET` must be populated directly from the response rather than using `ignore_read: true`.
 
 In the flattener for the field, return the value of the field in the user's configuration.
 

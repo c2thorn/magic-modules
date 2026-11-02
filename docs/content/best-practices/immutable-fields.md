@@ -19,6 +19,13 @@ Some fields or resources may be possible to update in place, but only under spec
 
 In complex cases, it is better to mark the field `ForceNew` to ensure that users can apply their configurations successfully.
 
+## MMv1 Immutability on Nested Objects & Identity Fields
+
+In Magic Modules, property immutability is evaluated per property rather than automatically cascading from parents to children on updatable resources. On updatable resources (where the resource as a whole does not set `immutable: true`):
+
+- **Children of `immutable: true` `NestedObject` blocks**: Every child property inside an `immutable: true` `NestedObject` must repeat `immutable: true` so the MMv1 generator flags each child attribute with `ForceNew: true`.
+- **URL-Path Identity Fields**: URL parameters (`url_param_only: true` such as `location`, `region`, `zone`, or `name`/`*_id`) that identify the resource and cannot be modified after creation must also explicitly declare `immutable: true` so their schema definitions receive `ForceNew: true`.
+
 ## Safeguarding against deletion
 
 See [Deletion policy]({{< ref "/best-practices/deletion-policy" >}}) for details on how to modify the `deletion_policy` field that can be used to control deletion behavior for most provider resources.

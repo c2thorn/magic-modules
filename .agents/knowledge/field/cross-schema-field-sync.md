@@ -44,6 +44,15 @@ Several products expose both a mutable parent resource (for example `mmv1/produc
   description: Configuration not yet surfaced in Cloud Asset Inventory.
 ```
 
+## 3. Explicit `immutable: true` on Nested Children & Identity Fields
+
+In MMv1, immutability does not automatically cascade from parent objects to child properties on updatable resources (`mmv1/api/type.go`).
+
+- **Rule:** On updatable resources (where the resource as a whole does not set `immutable: true`):
+  1. Every child property inside an `immutable: true` `NestedObject` must explicitly set `immutable: true`.
+  2. Every URL-path identity parameter (`url_param_only: true` such as `location`, `region`, or `name`/`*_id`) that cannot be modified after creation must explicitly set `immutable: true`.
+- **Why:** Without property-level `immutable: true`, the generator emits updatable schema attributes without `ForceNew: true`, creating schema inconsistencies where changes to immutable child fields fail to plan resource recreations.
+
 ## Do NOT Use For
 
 - Do **not** set `is_missing_in_cai: true` on resources without `include_in_tgc_next: true`, or on fields that already exist in the CAI asset schema.

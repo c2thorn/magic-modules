@@ -33,9 +33,15 @@ unset or false, the field is considered to support update-in-place.
 Immutability is not inherited from field to field: subfields are still considered to
 be updatable in place by default. However, if the overall resource has
 [`immutable`]({{< ref "/reference/resource#immutable" >}}) set to true, all its
-fields are considered immutable.  Individual fields can override this for themselves
+fields are considered immutable. Individual fields can override this for themselves
 and their subfields with [`update_url`]({{< ref "/reference/field#update_url" >}})
 if they have a custom update method in the API.
+
+On updatable resources (where the overall resource is not marked immutable), every child
+property inside an `immutable: true` `NestedObject` and every URL-path identity parameter
+(`url_param_only: true` such as `location`, `region`, or `name`/`*_id`) must explicitly set
+`immutable: true` so the code generator generates `ForceNew: true` for each individual schema
+attribute.
 
 See [Best practices: Immutable fields]({{< ref "/best-practices/immutable-fields/" >}}) for more information.
 
@@ -126,6 +132,11 @@ on the user's configuration. If false or unset, the provider sets the field's
 value in the resource state based on the API response. Only use this attribute
 if the field cannot be read from GCP due to either API or provider constraints.
 
+When all children of a `NestedObject` are write-only or use `ignore_read: true`,
+and the API omits the parent object on `GET`, set `ignore_read: true` on the
+parent `NestedObject` as well so that state readback matches the omitted response.
+See `mmv1/products/agentidentity/AuthProvider.yaml` for an example.
+
 `ignore_read` is current not supported inside arrays of nested objects. See [tpg#23630](https://github.com/hashicorp/terraform-provider-google/issues/23630)
 for details and workarounds.
 
@@ -158,6 +169,12 @@ frequently-changed API-side defaults, but provides less useful information at
 plan time than `default_value` and causes the provider to ignore user
 configurations that explicitly set the field to an "empty" value.
 
+Set `default_from_api: true` (`Optional` + `Computed`) only when omitting the field
+on `Create` causes the API's `GET` response to return a materialized non-empty value
+on the wire (which would otherwise cause a post-create diff). When an API description
+mentions a conceptual backend default while `GET` omits the field when unset, keep the
+field pure `Optional` so users retain the ability to unset or clear it in HCL.
+
 Example:
 
 ```yaml
@@ -172,13 +189,12 @@ This attribute is useful for fields where the API would behave differently
 for an "empty" value vs no value for a particular field - for example,
 boolean fields that have an API-side default of true, or mutable fields updated via `PATCH` where transitioning from a non-zero value back to `false`, `0`, or `""` must include the zero value in the request body alongside `updateMask`.
 
-If true simulataneously with `default_from_api`, the provider will send empty values
-explicitly set in configuration. If the field is unset, the provider will
-accept API values as the default as usual with `default_from_api`.
-
-Due to a [bug](https://github.com/hashicorp/terraform-provider-google/issues/13201),
-NestedObject fields will currently be sent as `null` if unset (rather than being
-omitted.)
+When set simultaneously with `default_from_api: true`, the provider sends empty values
+explicitly set in configuration while omitting unset fields so the API default applies.
+This automatic omission when unset applies to top-level fields only. Nested fields inside
+objects require a `custom_expand` template using raw config inspection
+(`rd.GetRawConfigAt(path)`) returning a typed pointer or `nil` when unset; see
+`.agents/knowledge/field/zero-value-clearing.md` for guidance and template examples.
 
 Example:
 
@@ -366,7 +382,7 @@ Enum only. If the allowed values may change in the future, use a String field in
 stating the current allowed values in the String field's description. 
 See [Best practices: Validation]({{< ref "/best-practices/validation" >}}) for more information.
 
-Do not include UNSPECIFIED values in this list.
+Do not include UNSPECIFIED values in this list on user-configurable (`Optional` / `Required`) fields. Read-only (`output: true`) fields are exempt because no client-side `ValidateFunc` is generated and APIs frequently return `*_UNSPECIFIED` as an initial state during asynchronous provisioning.
 
 Magic Modules automatically appends `Possible values` from `enum_values` to both the generated Terraform schema description and the website markdown documentation for `Enum` fields (and `Array` of `Enum` items). Do not manually list `Possible values:` in `description` on an `Enum` field, or the rendered documentation will duplicate the list.
 

@@ -14,8 +14,8 @@ Unit tests in `mmv1/third_party/terraform/services/*/*_test.go` and `*_internal_
 
 ## When to Write Unit Tests
 
-Write standalone Go unit tests for custom functions with non-trivial algorithmic logic, branching, normalization, or parsing:
-- **Complex diff suppress functions** (`*DiffSuppress`): functions with custom normalization, parsing, or multi-case equivalence rules (not reuse of existing `tpgresource.*` suppressors or trivial single-comparison wrappers).
+Write standalone Go unit tests for custom helper functions containing non-trivial algorithmic logic, loops, multi-branching, normalization, or string/regex parsing:
+- **Complex diff suppress functions** (`*DiffSuppress`): functions with custom normalization, regex/string parsing, or multi-case equivalence rules (not reuse of existing `tpgresource.*` suppressors or trivial single-comparison wrappers).
 - **Custom validation functions** (`ValidateFunc`) & **compiled regexes**: testing edge-case inputs, boundary conditions, or domain-specific input rules.
 - **State upgraders & ID/URL parsers**: string parsing, URL normalization, or resource ID deconstruction.
 - **Complex custom expanders/flatteners**: non-trivial data transformations with branching or edge cases that are hard to cover exhaustively in live acceptance tests.
@@ -24,9 +24,18 @@ Write standalone Go unit tests for custom functions with non-trivial algorithmic
 
 ## Do NOT Use Unit Tests For
 
-- **Built-in Helpers & Standard CRUD Hooks**: Do NOT require standalone unit tests when wiring an existing `tpgresource.*` diff suppressor/validator, or for straightforward `encoder`/`decoder`/`update_encoder` hooks whose behavior is directly exercised by `TestAcc*` acceptance tests.
+- **Built-in Helpers & Trivial Suppressors**: Do NOT require standalone unit tests when attaching existing shared helpers (`tpgresource.*`, `customdiff.*`), or for trivial (`<= 5` lines, single-condition) custom `DiffSuppressFunc`s whose behavior is directly exercised by `TestAcc*` acceptance tests.
+- **Standard CRUD Hooks**: Straightforward `encoder`/`decoder`/`update_encoder` hooks are verified through live `TestAcc*` acceptance tests.
+- **Unmockable `CustomizeDiff` Methods**: Functions that rely on internal `schema.ResourceDiff` methods (such as `GetRawConfig` or unexported SDKv2 fields) cannot be cleanly instantiated in unit tests without complex private structs; verify their behavior through acceptance tests instead.
 - **Declarative Schema Properties**: Do NOT write unit tests that mock `r.Validate(c)` simply to check declarative schema properties (e.g. `Required`, `Optional`, `AtLeastOneOf`, `ConflictsWith`, `Default`).
   - **Why:** The Terraform SDK already tests its schema engine. Testing single declarative field permutations adds high-maintenance test bloat.
 - **One-Off Typo Fixes**: Do NOT add persistent unit tests for one-off typos or copy-paste slice errors.
   - **Why:** These are covered by standard acceptance tests (`TestAcc*`) or verified ephemerally during triage reproduction.
 - **Ephemeral Debug Tests**: Remove any ad-hoc unit tests created solely to reproduce an issue locally before finalizing a PR.
+
+## SDKv2 vs. Plugin Framework Diff Inspection
+
+When implementing or reviewing diff logic, use the methods supported by the resource framework:
+
+- **SDKv2 resources** (`github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema`): Inspect diff state using `d.NewValueKnown("field")`, `d.GetOk("field")`, `d.GetChange("field")`, and `rd.GetRawConfigAt(path)`.
+- **Plugin Framework resources** (`tpgframework`): Framework methods such as `.IsKnown()` or `basetypes.*` apply exclusively to Framework resources. Never demand or call Framework methods on SDKv2 schema objects.

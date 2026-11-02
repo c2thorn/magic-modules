@@ -63,6 +63,7 @@ Read this index at decision points; open only the source the task needs. Format 
 - **zero-value-clearing** — Clear mutable fields back to false, 0, "", or {} on PATCH using send_empty_value, allow_empty_object, or GetRawConfig. — [field/zero-value-clearing.md](field/zero-value-clearing.md)
 - **permadiff-decision-path** — Choose the right schema attribute or custom hook to eliminate post-apply diffs without masking real drift. — [field/permadiff-decision-path.md](field/permadiff-decision-path.md)
 - **cross-schema-field-sync** — Keep paired *Version.yaml snapshot schemas and TGC is_missing_in_cai flags synchronized when adding fields. — [field/cross-schema-field-sync.md](field/cross-schema-field-sync.md)
+- **import-safe-flatteners** — Write import-safe flatteners and handle server-populated defaults on ForceNew fields without breaking terraform import. — [field/import-safe-flatteners.md](field/import-safe-flatteners.md)
 
 ### Template (`template/`)
 

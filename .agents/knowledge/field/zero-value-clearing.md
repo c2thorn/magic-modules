@@ -5,7 +5,7 @@ topics: [field, custom-code]
 task_types: [field-add, new-resource, bug-fix]
 source: docs/content/reference/field.md + mmv1 template behavior
 status: draft
-last_verified: 2026-10-28
+last_verified: 2026-11-02
 ---
 
 # Zero-Value Clearing (`false`, `0`, `""`, `{}`) & Raw Config Access
@@ -36,6 +36,8 @@ Always include a two-step acceptance test transition from non-zero to zero (for 
 
 `d.Get("field")` and `d.GetOk("field")` cannot distinguish between a field omitted from HCL (`null`) and a field explicitly configured to its Go zero value (`false`, `0`, `""`).
 
+### Top-Level Fields vs. Handwritten / Custom Diff Code
+
 - **Rule:** In custom expanders, encoders, `custom_diff`, or handwritten CRUD code where "omitted by user" and "explicitly set to `false` / `0` / `""`" have different API semantics, inspect `d.GetRawConfig()` (or `diff.GetRawConfig()` inside `CustomizeDiff`):
 
 ```go
@@ -47,6 +49,42 @@ if !rawCfg.IsNull() && rawCfg.IsKnown() {
 	}
 }
 ```
+
+### Nested Fields with `default_from_api` (Custom Expand with Raw Config Inspection)
+
+When a nested field inside an object needs explicit zero values (`false` or `0`) sent on the wire while leaving unconfigured fields omitted so the API default applies, implement a `custom_expand` template using `rd.GetRawConfigAt(path)` and returning a pointer (`*bool` or `*int64`, or `nil` when unset), guarded for non-TGC compilers.
+
+Returning a pointer allows the expander to distinguish an explicit zero from an unconfigured field: a non-nil pointer (`&f` or `&zero`) is recognized as non-empty and serialized in the request body, while `nil` omits the field entirely so the API default is preserved.
+
+```go
+func expand{{$.GetPrefix}}{{$.TitlelizeProperty}}(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	b, ok := v.(bool)
+	if !ok {
+		return nil, nil
+	}
+	if b {
+		return b, nil
+	}
+{{- if not (contains $.ResourceMetadata.ProductMetadata.Compiler "terraformgoogleconversion") }}
+
+	if rd, ok := d.(*schema.ResourceData); ok {
+		path := cty.GetAttrPath("parent_block").IndexInt(0).GetAttr("{{ underscore $.Name }}")
+		if val, _ := rd.GetRawConfigAt(path); !val.IsNull() && val.IsKnown() {
+			f := false
+			return &f, nil
+		}
+	}
+{{- end }}
+
+	return nil, nil
+}
+```
+
+#### Live Reference Templates
+
+Refer to live implementations in the repository:
+- `mmv1/templates/terraform/custom_expand/compute_backend_service_cdn_policy_ttl.go.tmpl` (integer TTL returning `*int64` or `nil`)
+- `mmv1/templates/terraform/custom_expand/modelarmor_template_data_residency_compliant.go.tmpl` (boolean returning `*bool` or `nil`)
 
 ## Do NOT Use `send_empty_value: true` For
 
