@@ -25,10 +25,10 @@ Instead, always run Go module commands inside a generated downstream provider (`
 
 ### 1. Determine Update Scope
 
-Unless the user explicitly specifies a narrower target (such as bumping a single package or running `go mod tidy` only), **default to updating all module and test dependencies (`go get -u ./... && go mod tidy`)**:
-* **Default — All module & test dependencies**: `go get -u ./...` + `go mod tidy`
-* **Targeted package bump** (when a specific package is requested, e.g., `google.golang.org/api`): `go get <package>@<version>` (or `@latest`) + `go mod tidy`
-* **Tidy only** (when requested): `go mod tidy`
+Choose the narrowest scope that matches the task (avoid bare `go get` without arguments):
+* **Targeted package bump** (preferred when unblocking a specific SDK/client version, e.g., `google.golang.org/api`): `go get <package>@<version>` + `go mod tidy`
+* **Full module & test dependency sweep** (for dedicated dependency-maintenance PRs): `go get -u ./...` + `go mod tidy`
+* **Tidy only** (when syncing module metadata without version upgrades): `go mod tidy`
 
 ### 2. Generate the Downstream Provider and Update Dependencies
 
@@ -49,10 +49,10 @@ make provider VERSION=ga OUTPUT_PATH="$PROVIDER_PATH"
 
 # 3. Update dependencies inside the generated downstream provider
 cd "$PROVIDER_PATH"
-# Default: Update all module and test dependencies
-go get -u ./...
-# Or, if a specific package was requested:
-# go get google.golang.org/api@latest
+# Targeted bump (preferred when upgrading a single library):
+go get google.golang.org/api@<version>
+# Or, for a dedicated full-module dependency upgrade PR:
+# go get -u ./...
 
 go mod tidy
 ```
@@ -91,4 +91,4 @@ cp "$PROVIDER_PATH/go.sum" "$MAGIC_MODULES_PATH/mmv1/third_party/terraform/go.su
    make lint
    make testnolint
    ```
-3. **Separate Pull Request:** Per [docs/content/develop/update-dependencies.md](../../../../docs/content/develop/update-dependencies.md), submit dependency upgrades in a standalone PR containing *only* the `go.mod` and `go.sum` changes (plus any code adjustments required by the upgrade) with a `release-note:none` block.
+3. **Pull Request Scoping:** Per [docs/content/develop/update-dependencies.md](../../../../docs/content/develop/update-dependencies.md), open a standalone PR (`release-note:none`) for broad or multi-package dependency upgrades (plus any required compatibility fixes). If a feature or bugfix PR requires new fields from a targeted single-package bump (such as `google.golang.org/api`), you may include that clean `go.mod`/`go.sum` bump in the same PR without unrelated dependency churn.
