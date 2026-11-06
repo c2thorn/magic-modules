@@ -41,11 +41,13 @@ specific one.
 *   **Deprecate Resource or Field Workflow** (`.agents/skills/workflows/deprecate_resource_or_field/SKILL.md`): Specifically for deprecating existing resources or fields on `main` prior to a major release.
 *   **Major Release Removal Workflow** (`.agents/skills/workflows/major_release_removal/SKILL.md`): Specifically for executing resource and field removals on a major release feature branch.
 *   **Promote to GA Workflow** (`.agents/skills/workflows/promote_to_ga/SKILL.md`): For promoting beta-only resources, fields, data sources, or products to the GA provider, including verification CI doesn't perform.
+*   **Orchestrated Review Workflow (Opt-In)** (`.agents/skills/workflows/orchestrated_review/SKILL.md`): Opt-in two-wave multi-agent code review workflow (holistic Lead pass + 3 parallel `code-reviewer` slices) for large or high-risk changes; standard review requests use `.agents/skills/utils/code-review/SKILL.md`.
 *   *(Future workflows can be added here)*
 
 ## Subagents:
 
 *   **`autogen`** (`.agents/agents/autogen/`): Generates new Terraform resources and acceptance tests from OpenAPI specifications using the autogen tool.
+*   **`code-reviewer`** (`.agents/agents/code-reviewer/`): Read-only code reviewer that audits a PR, branch, or domain slice against `review-pr.md` and `.agents/knowledge/` without modifying files.
 *   **`qa-test-runner`** (`.agents/agents/qa-test-runner/`): Reproduces acceptance test failures and parses debug logs into structured API traces without modifying code.
 *   **`removal-auditor`** (`.agents/agents/removal-auditor/`): Audits deprecation status on `main`, sync status on the major release branch, and scans repository dependencies for resource and field removals.
 *   **`repo-sync`** (`.agents/agents/repo-sync/`): Initializes and synchronizes downstream provider repositories with Magic Modules to establish a clean verification baseline.

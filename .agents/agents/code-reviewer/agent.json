@@ -1,0 +1,7 @@
+{
+  "name": "code-reviewer",
+  "description": "Read-only Magic Modules code reviewer that audits a pull request, branch, or domain slice against docs/content/code-review/review-pr.md and .agents/knowledge/ without modifying files.",
+  "configPath": {
+    "relativePathToConfig": "config.yaml"
+  }
+}
