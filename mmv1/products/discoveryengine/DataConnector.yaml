@@ -57,6 +57,11 @@ samples:
       - name: 'discoveryengine_dataconnector_servicenow_basic'
         resource_id_vars:
           collection_id: 'collection-id'
+        # The API asynchronously transitions state (e.g., ACTIVE -> RUNNING) and
+        # updates update_time when periodic sync starts after initialization.
+        ignore_read_extra:
+          - state
+          - update_time
   - name: 'discoveryengine_dataconnector_jira_with_actions'
     primary_resource_id: 'jira-with-actions'
     steps:
@@ -369,6 +374,7 @@ properties:
       BAP (Business Application Platform) configuration for the data
       connector. Controls which actions are enabled for connectors
       using the ACTIONS connector mode.
+    default_from_api: true
     properties:
       - name: 'enabledActions'
         type: Array
@@ -377,6 +383,7 @@ properties:
           values include: `create_issue`, `update_issue`,
           `change_issue_status`, `create_comment`, `update_comment`,
           `upload_attachment`.
+        default_from_api: true
         item_type:
           type: String
       - name: 'supportedConnectorModes'
@@ -384,6 +391,7 @@ properties:
         description: |
           The connector modes supported by the BAP configuration.
           The possible values include: `ACTIONS`.
+        default_from_api: true
         item_type:
           type: String
   - name: 'actionState'
