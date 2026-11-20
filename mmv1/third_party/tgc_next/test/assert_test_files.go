@@ -90,17 +90,17 @@ func BidirectionalConversion(t *testing.T, ignoredFields []string, primaryResour
 				resourceTestData := testData.ResourceTestData
 				if primaryResource != "" {
 					t.Logf("%s: Test for the primary resource %s begins.", tName, primaryResource)
-					err = testSingleResource(t, tName, resourceTestData[primaryResource], tfDir, ignoredFields, logger, true)
+					err = testSingleResource(t, tName, resourceTestData[primaryResource], testData, tfDir, ignoredFields, logger, true)
 					if err != nil {
 						attemptErrors = append(attemptErrors, err)
 						return err
 					}
 				} else {
-					for address, testData := range resourceTestData {
+					for address, resourceData := range resourceTestData {
 						if !strings.HasPrefix(address, primaryResourceType) {
 							continue
 						}
-						err = testSingleResource(t, tName, testData, tfDir, ignoredFields, logger, false)
+						err = testSingleResource(t, tName, resourceData, testData, tfDir, ignoredFields, logger, false)
 						if err != nil {
 							attemptErrors = append(attemptErrors, err)
 							return err
@@ -143,7 +143,7 @@ func BidirectionalConversion(t *testing.T, ignoredFields []string, primaryResour
 }
 
 // Tests a single resource
-func testSingleResource(t *testing.T, testName string, testData ResourceTestData, tfDir string, ignoredFields []string, logger *zap.Logger, primaryResource bool) error {
+func testSingleResource(t *testing.T, testName string, testData ResourceTestData, stepData *StepTestData, tfDir string, ignoredFields []string, logger *zap.Logger, primaryResource bool) error {
 	resourceType := testData.ResourceType
 	var tfplan2caiSupported, cai2hclSupported bool
 	if _, tfplan2caiSupported = tfplan2caiconverters.ConverterMap[resourceType]; !tfplan2caiSupported {
@@ -157,7 +157,7 @@ func testSingleResource(t *testing.T, testName string, testData ResourceTestData
 
 	assets := make([]caiasset.Asset, 0)
 	for assetName, assetData := range testData.Cai {
-		assets = append(assets, assetData.CaiAsset)
+		assets = append(assets, assetData.CaiAsset.Asset)
 		assetType := assetData.CaiAsset.Type
 		if assetType == "" {
 			log.Printf("%s: cai asset is unavailable for %s", testName, assetName)
@@ -238,6 +238,21 @@ func testSingleResource(t *testing.T, testName string, testData ResourceTestData
 	// Sometimes, the reason for missing fields could be CAI asset data issue.
 	if len(missingKeys) > 0 {
 		log.Printf("%s: missing fields in resource %s after cai2hcl conversion:\n%s", testName, testData.ResourceAddress, missingKeys)
+
+		// The CAI asset is not test data for this step if it is a snapshot of the resource at another step.
+		checker := snapshotChecker{
+			requiredKeys: func(rawConfig map[string]any) []string {
+				return compareHCLFields(rawConfig, map[string]any{}, ignoredFieldSet, resourceSchema)
+			},
+			exportAttributes: func(assets []caiasset.Asset) (map[string]any, error) {
+				return exportAttributes(assets, resourceType, logger)
+			},
+		}
+		if reason := checker.explainMissingKeys(stepData, testData, missingKeys); reason != "" {
+			log.Printf("%s: the missing fields in resource %s are not a conversion issue: %s", testName, testData.ResourceAddress, reason)
+			return retry.RetryableError(fmt.Errorf("fail: test data is unavailable: %s", reason))
+		}
+
 		return retry.RetryableError(fmt.Errorf("missing fields: %v", missingKeys))
 	}
 	log.Printf("%s: Step 1 passes for resource %s. All of the fields in raw config are in export config", testName, testData.ResourceAddress)

@@ -24,7 +24,26 @@ type ResourceMetadata struct {
 
 // CaiData holds the fetched CAI asset and related error information.
 type CaiData struct {
-	CaiAsset caiasset.Asset `json:"cai_asset,omitempty"`
+	CaiAsset NightlyAsset `json:"cai_asset,omitempty"`
+}
+
+// NightlyAsset is a CAI asset as it is stored in the nightly tests metadata. In addition to
+// the fields that are used in the conversion, it has the time of the last change of the asset.
+type NightlyAsset struct {
+	caiasset.Asset
+	UpdateTime *AssetUpdateTime `json:"update_time,omitempty"`
+}
+
+type AssetUpdateTime struct {
+	Seconds int64 `json:"seconds"`
+	Nanos   int64 `json:"nanos"`
+}
+
+func (t *AssetUpdateTime) Time() time.Time {
+	if t == nil {
+		return time.Time{}
+	}
+	return time.Unix(t.Seconds, t.Nanos)
 }
 
 type NightlyRun struct {
@@ -51,6 +70,9 @@ type StepTestData struct {
 	StepNumber       int
 	PrimaryResource  string
 	ResourceTestData map[string]ResourceTestData // key is resource address
+	// The metadata of all of the steps of the test in the same nightly run. The key is the step number.
+	// It is used to find out if a CAI asset is a snapshot of the resource at another step.
+	Steps map[int]TgcMetadataPayload
 }
 
 type Resource struct {
@@ -262,6 +284,7 @@ func prepareTestData(testName string, stepNumber int, retries int) (*StepTestDat
 			StepNumber:       stepNumber,
 			PrimaryResource:  stepMetadata.PrimaryResource,
 			ResourceTestData: resourceTestData,
+			Steps:            testMetadata,
 		}, nil
 	}
 
