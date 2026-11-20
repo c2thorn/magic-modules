@@ -201,3 +201,15 @@ properties:
       - name: clusterTier
         type: String
         ignore_read: true
+  - name: rollbackSafeUpgrade
+    type: NestedObject
+    # rollback_safe_upgrade is an input of the control plane upgrade request, not
+    # cluster state: the provider never reads it back, and the API (and therefore
+    # the CAI asset) only carries rollbackSafeUpgrade while the control plane is
+    # soaking. It is gone once the upgrade is completed with desired_emulated_version,
+    # while the configuration still sets it, so cai2hcl cannot reproduce it.
+    ignore_read: true
+    properties:
+      - name: controlPlaneSoakDuration
+        type: String
+        ignore_read: true
