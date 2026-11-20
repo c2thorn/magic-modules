@@ -146,6 +146,26 @@ func getIdentifierSortKey(flattened map[string]any) string {
 	return strings.Join(vals, ";")
 }
 
+// isZeroValue returns true for the values that compareHCLFields does not require
+// in the export config: false, 0, "" and empty objects.
+func isZeroValue(val any) bool {
+	switch v := val.(type) {
+	case nil:
+		return true
+	case bool:
+		return !v
+	case float64:
+		return v == 0
+	case string:
+		return v == ""
+	case map[string]any:
+		return len(v) == 0
+	case struct{}:
+		return true
+	}
+	return false
+}
+
 func flattenSlice(prefix string, v []any, result map[string]any) {
 	if len(v) == 0 && prefix != "" {
 		result[prefix] = struct{}{}
@@ -153,9 +173,10 @@ func flattenSlice(prefix string, v []any, result map[string]any) {
 	}
 
 	type sortableElement struct {
-		sortKey   string
-		flatKeys  string
-		flattened map[string]any
+		sortKey     string
+		nonZeroKeys string
+		flatKeys    string
+		flattened   map[string]any
 	}
 
 	sortable := make([]sortableElement, len(v))
@@ -166,20 +187,34 @@ func flattenSlice(prefix string, v []any, result map[string]any) {
 		sortKey := getIdentifierSortKey(flattened)
 
 		keyVals := make([]string, 0, len(flattened))
+		nonZeroKeyVals := make([]string, 0, len(flattened))
 		for k, val := range flattened {
-			keyVals = append(keyVals, fmt.Sprintf("%s=%v", k, val))
+			keyVal := fmt.Sprintf("%s=%v", k, val)
+			keyVals = append(keyVals, keyVal)
+			if !isZeroValue(val) {
+				nonZeroKeyVals = append(nonZeroKeyVals, keyVal)
+			}
 		}
 		sort.Strings(keyVals)
+		sort.Strings(nonZeroKeyVals)
 		sortable[i] = sortableElement{
-			sortKey:   sortKey,
-			flatKeys:  strings.Join(keyVals, ";"),
-			flattened: flattened,
+			sortKey:     sortKey,
+			nonZeroKeys: strings.Join(nonZeroKeyVals, ";"),
+			flatKeys:    strings.Join(keyVals, ";"),
+			flattened:   flattened,
 		}
 	}
 
-	sort.Slice(sortable, func(i, j int) bool {
+	// Order the elements by their non-zero values first. A raw config may spell out a
+	// zero value (e.g. `ignore_case = false`) that is omitted from the config converted
+	// from a CAI asset, so a sort key containing zero values would give the same element
+	// a different index on each side of the comparison.
+	sort.SliceStable(sortable, func(i, j int) bool {
 		if sortable[i].sortKey != "" && sortable[j].sortKey != "" && sortable[i].sortKey != sortable[j].sortKey {
 			return sortable[i].sortKey < sortable[j].sortKey
+		}
+		if sortable[i].nonZeroKeys != sortable[j].nonZeroKeys {
+			return sortable[i].nonZeroKeys < sortable[j].nonZeroKeys
 		}
 		return sortable[i].flatKeys < sortable[j].flatKeys
 	})

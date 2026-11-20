@@ -117,6 +117,61 @@ resource "google_compute_backend_bucket" "image_backend" {
   }
 }
 `
+
+	// A raw config that spells out zero values in repeated blocks
+	listWithZeroValuesHCL = `
+resource "google_network_security_authz_policy" "default" {
+  http_rules {
+    to {
+      operations {
+        hosts {
+          ignore_case = false
+          prefix      = "prefix"
+        }
+        hosts {
+          ignore_case = true
+          suffix      = "suffix"
+        }
+        hosts {
+          exact       = "exact"
+          ignore_case = false
+        }
+        hosts {
+          contains    = "contains"
+          ignore_case = true
+        }
+      }
+    }
+  }
+}
+`
+
+	// The same resource as listWithZeroValuesHCL after cai2hcl conversion,
+	// where the zero values are omitted
+	listWithoutZeroValuesHCL = `
+resource "google_network_security_authz_policy" "default" {
+  http_rules {
+    to {
+      operations {
+        hosts {
+          prefix = "prefix"
+        }
+        hosts {
+          ignore_case = true
+          suffix      = "suffix"
+        }
+        hosts {
+          exact = "exact"
+        }
+        hosts {
+          contains    = "contains"
+          ignore_case = true
+        }
+      }
+    }
+  }
+}
+`
 )
 
 func TestParseHCLBytes(t *testing.T) {
@@ -227,6 +282,37 @@ func TestParseHCLBytes(t *testing.T) {
 					"description": "Contains beautiful images",
 					"bucket_name": "tf-test-image-backend-bucket",
 					"cdn_policy.cache_key_policy.query_string_whitelist": "image-version",
+				},
+			},
+		},
+		{
+			name: "list of nested objects with zero values",
+			hcl:  listWithZeroValuesHCL,
+			exp: map[string]map[string]any{
+				"google_network_security_authz_policy.default": {
+					// Zero values do not change the index of an element
+					"http_rules.to.operations.hosts.0.contains":    "contains",
+					"http_rules.to.operations.hosts.0.ignore_case": true,
+					"http_rules.to.operations.hosts.1.exact":       "exact",
+					"http_rules.to.operations.hosts.1.ignore_case": false,
+					"http_rules.to.operations.hosts.2.ignore_case": true,
+					"http_rules.to.operations.hosts.2.suffix":      "suffix",
+					"http_rules.to.operations.hosts.3.ignore_case": false,
+					"http_rules.to.operations.hosts.3.prefix":      "prefix",
+				},
+			},
+		},
+		{
+			name: "list of nested objects without zero values",
+			hcl:  listWithoutZeroValuesHCL,
+			exp: map[string]map[string]any{
+				"google_network_security_authz_policy.default": {
+					"http_rules.to.operations.hosts.0.contains":    "contains",
+					"http_rules.to.operations.hosts.0.ignore_case": true,
+					"http_rules.to.operations.hosts.1.exact":       "exact",
+					"http_rules.to.operations.hosts.2.ignore_case": true,
+					"http_rules.to.operations.hosts.2.suffix":      "suffix",
+					"http_rules.to.operations.hosts.3.prefix":      "prefix",
 				},
 			},
 		},
