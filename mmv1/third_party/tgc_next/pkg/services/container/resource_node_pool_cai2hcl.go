@@ -142,9 +142,8 @@ func flattenNodePoolUpgradeSettings(v interface{}) []map[string]interface{} {
 		upgradeSettings["max_unavailable"] = v
 	}
 
-	// "SHORT_LIVED" strategy is not supported by the Terraform provider yet.
 	// Suppress Default Value "SURGE"
-	if strategy, ok := us["strategy"].(string); ok && strategy != "SHORT_LIVED" && strategy != "SURGE" {
+	if strategy, ok := us["strategy"].(string); ok && strategy != "SURGE" {
 		upgradeSettings["strategy"] = strategy
 	}
 

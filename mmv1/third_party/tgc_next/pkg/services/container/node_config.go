@@ -433,6 +433,13 @@ func schemaNodeConfig() *schema.Schema {
 								ValidateFunc: validation.IntAtLeast(0),
 								Description:  `Number of local SSDs to be utilized for GKE Data Cache. Uses NVMe interfaces.`,
 							},
+							"ephemeral_capacity_gb": {
+								Type:         schema.TypeInt,
+								Optional:     true,
+								ForceNew:     true,
+								ValidateFunc: validation.IntAtLeast(0),
+								Description:  `Number of gigabytes of local SSD capacity to use for ephemeral storage in mixed local SSD mode. The remaining capacity is available for raw block storage.`,
+							},
 						},
 					},
 				},
@@ -1386,6 +1393,15 @@ func schemaNodeConfig() *schema.Schema {
 					ForceNew:    true,
 					Description: `Enables Flex Start provisioning model for the node pool`,
 				},
+				"consolidation_delay": {
+					Type:     schema.TypeString,
+					Optional: true,
+					// The GKE API doesn't support unsetting this field, so a value removed
+					// from the configuration is kept as-is in state.
+					Computed:         true,
+					DiffSuppressFunc: tpgresource.DurationDiffSuppress,
+					Description:      `Duration after which the Cluster Autoscaler can scale down underutilized nodes in the node pool. Requires autoscaling to be enabled on the node pool. If not set, nodes are scaled down according to the cluster's autoscaling profile. The GKE API doesn't support unsetting this field, so removing it from the configuration leaves the current value unchanged. A duration in seconds with up to nine fractional digits, ending with 's'. Example: "600s".`,
+				},
 			},
 		},
 	}
@@ -1618,7 +1634,9 @@ func expandNodeConfig(d tpgresource.TerraformResourceData, prefix string, v inte
 		if ok {
 			nc.EphemeralStorageLocalSsdConfig.DataCacheCount = int64(dataCacheCount.(int))
 		}
-
+		if ephemeralCapacityGb, ok := conf["ephemeral_capacity_gb"]; ok {
+			nc.EphemeralStorageLocalSsdConfig.EphemeralCapacityGb = int64(ephemeralCapacityGb.(int))
+		}
 	}
 
 	if v, ok := nodeConfig["secondary_boot_disks"]; ok && len(v.([]interface{})) > 0 {
@@ -1861,6 +1879,10 @@ func expandNodeConfig(d tpgresource.TerraformResourceData, prefix string, v inte
 
 	if v, ok := nodeConfig["flex_start"]; ok {
 		nc.FlexStart = v.(bool)
+	}
+
+	if v, ok := nodeConfig["consolidation_delay"]; ok {
+		nc.ConsolidationDelay = v.(string)
 	}
 
 	if v, ok := nodeConfig["confidential_nodes"]; ok {
@@ -2735,6 +2757,7 @@ func flattenNodeConfig(v interface{}, _ interface{}) []map[string]interface{} {
 		"advanced_machine_features":   flattenAdvancedMachineFeaturesConfig(c["advancedMachineFeatures"]),
 		"max_run_duration":            c["maxRunDuration"],
 		"flex_start":                  c["flexStart"],
+		"consolidation_delay":         c["consolidationDelay"],
 		"sole_tenant_config":          flattenSoleTenantConfig(c["soleTenantConfig"]),
 		"fast_socket":                 flattenFastSocket(c["fastSocket"]),
 		"resource_manager_tags":       flattenResourceManagerTags(c["resourceManagerTags"]),
@@ -2922,6 +2945,19 @@ func flattenEphemeralStorageLocalSsdConfig(v interface{}) []map[string]interface
 	transformed := map[string]interface{}{
 		"local_ssd_count":  localSsdCount,
 		"data_cache_count": c["dataCacheCount"],
+	}
+
+	// ephemeralCapacityGb is an int64, which CAI serializes as a JSON string.
+	// Only set it when it is positive, like the provider's flattener.
+	switch capacity := c["ephemeralCapacityGb"].(type) {
+	case string:
+		if intCapacity, err := strconv.Atoi(capacity); err == nil && intCapacity > 0 {
+			transformed["ephemeral_capacity_gb"] = intCapacity
+		}
+	case float64:
+		if capacity > 0 {
+			transformed["ephemeral_capacity_gb"] = int(capacity)
+		}
 	}
 
 	return []map[string]interface{}{transformed}

@@ -311,7 +311,25 @@ func expandContainerCluster(project string, d tpgresource.TerraformResourceData,
 	if v, ok := d.GetOk("rbac_binding_config"); ok {
 		cluster.RbacBindingConfig = expandRBACBindingConfig(v)
 	}
+
+	if v, ok := d.GetOk("schedule_upgrade_config"); ok {
+		cluster.ScheduleUpgradeConfig = expandScheduleUpgradeConfig(v)
+	}
 	return cluster, nil
+}
+
+func expandScheduleUpgradeConfig(configured interface{}) *container.ScheduleUpgradeConfig {
+	l, ok := configured.([]interface{})
+	if !ok || len(l) == 0 || l[0] == nil {
+		return nil
+	}
+
+	config := l[0].(map[string]interface{})
+	enabled, _ := config["enabled"].(bool)
+	return &container.ScheduleUpgradeConfig{
+		Enabled:         enabled,
+		ForceSendFields: []string{"Enabled"},
+	}
 }
 
 func expandEnterpriseConfig(configured interface{}) *container.EnterpriseConfig {

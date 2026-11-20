@@ -235,6 +235,7 @@ func (c *ContainerClusterCai2hclConverter) convertResourceData(asset caiasset.As
 	hclData["managed_opentelemetry_config"] = flattenManagedOpenTelemetryConfig(asset.Resource.Data["managedOpentelemetryConfig"])
 	hclData["node_pool_auto_config"] = flattenNodePoolAutoConfig(asset.Resource.Data["nodePoolAutoConfig"])
 	hclData["rbac_binding_config"] = flattenRBACBindingConfig(asset.Resource.Data["rbacBindingConfig"])
+	hclData["schedule_upgrade_config"] = flattenScheduleUpgradeConfig(asset.Resource.Data["scheduleUpgradeConfig"])
 
 	ctyVal, err := utils.MapToCtyValWithSchema(hclData, c.schema)
 	if err != nil {
@@ -2034,10 +2035,36 @@ func flattenNodeCreationConfig(v interface{}) []map[string]interface{} {
 	if !ok {
 		return nil
 	}
+	// The API returns an empty nodeCreationConfig object ({}) for clusters that
+	// don't report a node creation mode (e.g. GKE 1.34 control planes).
+	// node_creation_mode is required in the schema, so emitting the block
+	// without it produces HCL that fails `terraform plan`. Omit the block.
+	mode, ok := ncc["nodeCreationMode"].(string)
+	if !ok || mode == "" {
+		return nil
+	}
 	transformed := map[string]interface{}{
-		"node_creation_mode": ncc["nodeCreationMode"],
+		"node_creation_mode": mode,
 	}
 	return []map[string]interface{}{transformed}
+}
+
+func flattenScheduleUpgradeConfig(v interface{}) []map[string]interface{} {
+	if v == nil {
+		return nil
+	}
+	c, ok := v.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+	// enabled is required in the schema, so always set it when the
+	// scheduleUpgradeConfig object is present. An absent value means false.
+	enabled, _ := c["enabled"].(bool)
+	return []map[string]interface{}{
+		{
+			"enabled": enabled,
+		},
+	}
 }
 
 func flattenManagedOpenTelemetryConfig(v interface{}) []map[string]interface{} {
