@@ -1652,6 +1652,11 @@ properties:
     description: |
       Dynamic forwarding configuration. This field is used to configure the backend service with dynamic forwarding
       feature which together with Service Extension allows customized and complex routing logic.
+    # dynamicForwarding is not present in CAI asset (same as BackendService).
+    # It is only served by the dated compute API version set in `api_version`;
+    # CAI exports this resource using the compute v1 schema, which does not
+    # have the field.
+    is_missing_in_cai: true
     properties:
       - name: 'ipPortSelection'
         type: NestedObject
