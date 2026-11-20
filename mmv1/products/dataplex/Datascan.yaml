@@ -941,6 +941,8 @@ properties:
       - name: generationScopes
         type: Array
         immutable: true
+        # generationScopes is not present in CAI asset
+        is_missing_in_cai: true
         description: |
           Specifies which components of the data documentation to generate. Any component that is required to generate the specified components will also be generated. If no generation scope is specified, all available documentation components will be generated.
         item_type:

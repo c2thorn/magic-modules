@@ -1393,6 +1393,10 @@ properties:
                           - 'DISABLED'
                   - name: 'imageOptimizationPolicy'
                     type: NestedObject
+                    # imageOptimizationPolicy is not present in CAI asset. It is only served by
+                    # the dated compute API version set in `api_version`; CAI exports this
+                    # resource using the compute v1 schema, which does not have the field.
+                    is_missing_in_cai: true
                     description: |
                       Specifies the policy for optimizing images returned in the HTTP response.
                     properties:
@@ -2536,6 +2540,10 @@ properties:
                           - 'DISABLED'
                   - name: 'imageOptimizationPolicy'
                     type: NestedObject
+                    # imageOptimizationPolicy is not present in CAI asset. It is only served by
+                    # the dated compute API version set in `api_version`; CAI exports this
+                    # resource using the compute v1 schema, which does not have the field.
+                    is_missing_in_cai: true
                     description: |
                       Specifies the policy for optimizing images returned in the HTTP response.
                     properties:
@@ -3471,6 +3479,10 @@ properties:
                     - 'DISABLED'
             - name: 'imageOptimizationPolicy'
               type: NestedObject
+              # imageOptimizationPolicy is not present in CAI asset. It is only served by
+              # the dated compute API version set in `api_version`; CAI exports this
+              # resource using the compute v1 schema, which does not have the field.
+              is_missing_in_cai: true
               description: |
                 Specifies the policy for optimizing images returned in the HTTP response.
               properties:
@@ -4746,6 +4758,10 @@ properties:
               - 'DISABLED'
       - name: 'imageOptimizationPolicy'
         type: NestedObject
+        # imageOptimizationPolicy is not present in CAI asset. It is only served by
+        # the dated compute API version set in `api_version`; CAI exports this
+        # resource using the compute v1 schema, which does not have the field.
+        is_missing_in_cai: true
         description: |
           Specifies the policy for optimizing images returned in the HTTP response.
         at_least_one_of:

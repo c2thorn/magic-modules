@@ -365,6 +365,10 @@ properties:
   - name: 'ipAddresses'
     api_name: 'IPAddresses'
     type: Array
+    # IPAddresses is not present in CAI asset. It is only served by the dated
+    # compute API version set in `api_version`; CAI exports this resource
+    # using the compute v1 schema, which does not have the field.
+    is_missing_in_cai: true
     description: |
       IP addresses for which this forwarding rule accepts traffic, ordered by
       Availability Group 0 followed by Availability Group 1. Specify literal
